@@ -145,8 +145,8 @@ RCU修改，分配一个新的数据结构，复制原来的数据结构到新�
 * 访问用户空间
  * copy\_from\_user()
  * copy\_to\_user()
- * get_user()
- * put_user()
+ * get\_user()
+ * put\_user()
 * kmalloc(GFP_KERNEL)
 * down\_interruptible()和down()
 * down\_trylock()可以在中断上下文中使用
