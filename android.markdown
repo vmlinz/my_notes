@@ -199,12 +199,48 @@ Android为了使开发者透明的使用binder机制而不用直接操作binder�
 * 客户端得到Service代理对象也必须定义成IBinder（继承扩展IBinder接口）对象。这也是为什么BpBinder就是继承自IBinder。
 * 客户端发送请求给服务器进程，调用接口的Service代理对象IBinder接口的transact方法。
 * Android系统Binder机制将负责把用户的请求，调用Service对象IBinder接口的onTransact方法。具体实现我们将在以后介绍Service的时候讨论。
-
+* IBinder对象还是比较底层的binder封装，实际在使用的时候，我们更倾向于使用native对象和proxy对象的共同interface，这样看起来更象是rpc调用。
 ### Clients ###
 
 客户端一般是android系统上的普通应用程序，它可以通过和binder通信来远程调用服务器进程的功能。
 
 ### Binder For Java ###
+
+这里我们来学习整理一下android java层上服务代理对象的创建和使用
+
+#### Java binder ####
+
+java binder使用和c/c++层的同样的binder封装，它的最终实现都是通过jni调用native binder的相关函数来实现的，接下来我们从android源代码来学习java层服务代理对象的创建和使用
+
+#### 获取ServiceManager ####
+
+从前面对binder系统和Service的分析中我们知道，要得到一个具体服务的代理对象，首先要创建SM的代理对象。java层也是一样的。
+
+* 文件：
+ - ServiceManager.java
+ - ServiceManagerNative.java
+ - BinderInternal.java
+* 函数调用路径：
+ - ServiceManager.getIServiceManager();
+ - ServiceManagerNative.asInterface(IBinder obj);将IBinder对象转为Interface
+ - BinderInternal.getContextObject();
+ - native IBinder getContextObject();jni native函数声明
+ - android\_os\_BinderInternal\_getContextObject(JNIEnv* env, jobject clazz);实现
+
+#### 从SM获取其他服务 ####
+
+和native binder一样，在得到SM对象代理之后就是通过对象代理去获取需要的服务对象，进而调用远程服务。
+
+* 文件：
+ - ServiceManager.java
+ - ServiceManagerNative.java
+* 函数调用路径：
+ - ServiceManager.getService(Context.NETWORKMANAGEMENT\_SERVICE);
+ - ServiceManagerProxy.getService();
+ - IBinder.transact();
+ - Parcel.readStrongBinder();
+ - jobject android\_os\_Parcel\_readStrongBinder();
+
 # Android Middleware #
 # Android Linux Kernel #
 # Android Open Source Project #
