@@ -134,7 +134,7 @@ void *kmalloc(size_t size, int flags);
 
 * flags参数 以多种方式控制kmalloc的行为
 
-最常用的标志是GFP\_KERNEL(GFP的来源是因为kmalloc最终会调用get\_free\_pages函数)，这个标志允许kamlloc在页面不足的情况下休眠。
+最常用的标志是GFP\_KERNEL(GFP的来源是因为kmalloc最终会调用get\_free\_pages函数)，这个标志允许kmalloc在页面不足的情况下休眠。
 
 如果在进程上下文之外使用kmalloc，比如中断处理例程中就需要使用GFP_ATOMIC标志，不会休眠
 
