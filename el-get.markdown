@@ -1,5 +1,5 @@
-*GNU Emacs的终极扩展管理工具 -- el-get*
-
+GNU Emacs的终极扩展管理工具 -- el-get
+==========
 <span style="color: #0000ff;">作者: </span><a href="http://vmlinz.is-programmer.com/" target="_blank"><span style="color: #0000ff;"><b>Nick Qi</b></span></a>
 
 > Let's el-get together
@@ -10,7 +10,7 @@ GNU Emacs一直以来都缺少一个统一的第三方lisp扩展管理器，GNU 
 
 <!--more-->
 
-### 当前第三方包管理方法 ###
+# 当前第三方包管理方法 #
 
 * [emacswiki](http://www.emacswiki.org/)有auto-install.el之类的管理工具
 * linux发行版的包管理（如debian的lisp包）
@@ -18,19 +18,19 @@ GNU Emacs一直以来都缺少一个统一的第三方lisp扩展管理器，GNU 
 * 手工使用git之类的版本控制工具来管理lisp扩展
 * 直接下载
 
-### 当前这些方法的不足之处 ###
+# 当前这些方法的不足之处 #
 
 * elpa可以管理当前大多数第三方扩展，但是仍然有很多不在里面
 * 手工管理，升级太麻烦，迁移也不方便
 * linux发行版的包管理，通常你用不了最新的扩展，而且迁移也挺麻烦
-* 开发分支的ELPA，不要认为GNU Emacs会放弃原来的授权方式，要进入官方ELPA估计和
-现在没有什么区别，仍然有很多作者不会把自己的代码交给FSF。不过也会有第三方ELPA。
+* 开发分支的ELPA，不要认为GNU Emacs会放弃原来的授权方式，要进入官方ELPA估计和现在没有什么区别，仍然有很多作者不会把自己的代码交给FSF。不过也会有第三方ELPA。
 
-### el-get华丽登场 ###
+# el-get华丽登场 #
 
-#### el-get简介 ####
+### el-get简介 ###
 
-* el-get能够透明的管理各种来源的第三方扩展（不管你是通过linux发行版获取，还是直接下载还是通过git等版本控制器获取的）
+* el-get能够透明的管理各种来源的第三方扩展（不管你是通过linux发行版获取，
+直接下载还是通过git等版本控制器获取的）
 * el-get能够安装，升级和移除它管理的第三方扩展
 * el-get支持安装后的初始化操作，支持hook操作
 * el-get支持扩展包man和info的安装，安装好后，你可以直接*C-h i*查看info
@@ -38,7 +38,7 @@ GNU Emacs一直以来都缺少一个统一的第三方lisp扩展管理器，GNU 
 * el-get支持异步和同步安装和初始化
 * el-get支持ELPA中的所有package安装，ELPA是它的一种安装方法。。。
 
-#### 安装el-get ####
+### 安装el-get ###
 
 el-get的作者参考和ELPA的package.el的做法，使得el-get的安装非常简单:
 <pre lang="lisp">
@@ -53,18 +53,15 @@ el-get的作者参考和ELPA的package.el的做法，使得el-get的安装非常
 
 复制上面的代码到*scratch*中，移动光标到最后，按下`C-j`然后就可坐等安装完成了。
 
-#### 使用el-get ####
+### 使用el-get ###
 
-el-get的作者是debian developer，所以el-get有深深的apt-get烙印。其实我还觉得
-el-get很有gentoo portage的影子，直接描诉扩展包地址，然后直接下载安装。
+el-get的作者是debian developer，所以el-get有深深的apt-get烙印。其实我还觉得el-get很有gentoo portage的影子，直接描诉扩展包地址，然后直接下载安装。
 
-##### 安装扩展 #####
+#### 安装扩展 ####
 
-接下来就是最激动人心的时刻了，让我们先用*magit*、*package*和*auto-complete*来
-演示el-get的几个功能。
+接下来就是最激动人心的时刻了，让我们先用*magit*、*package*和*auto-complete*来演示el-get的几个功能。
 
-对于*el-get*本身，你需要给它手动指定*load-path*，因为启动的时候需要先载入它的
-功能，然后才能通过它来安装和管理其他lisp扩展。
+对于*el-get*本身，你需要给它手动指定*load-path*，因为启动的时候需要先载入它的功能，然后才能通过它来安装和管理其他lisp扩展。
 
 当然在你刚安装玩el-get还没有重启GNU Emacs之前，你是可以直接使用它的功能的。
 
@@ -80,7 +77,7 @@ el-get很有gentoo portage的影子，直接描诉扩展包地址，然后直接
 </pre>
 复制上面的代码到*scratch*buffer，光标移动到buffer最后，键入*C-j*执行lisp代码。这样el-get、package、auto-complete和magit就被安装到~/.emacs.d/el-get目录下了。而且magit包在安装好后还执行了一个按键绑定操作，同样你也可以在任何需要配置的扩展后面使用定制函数。
 
-##### 初始化扩展 #####
+#### 初始化扩展 ####
 
 el-get还可以帮助你方便的初始化GNU Emacs扩展，在每个source描诉的:after后面可以放上自己的初始化函数，就像上面的magit那样。
 
@@ -89,26 +86,27 @@ el-get还可以帮助你方便的初始化GNU Emacs扩展，在每个source描�
 * (el-get 'sync) 完全同步，初始化的顺序严格按照el-get-sources中的顺序完成
 * (el-get 'wait) 初始化过程异步，可以多个source同时初始化，但会等待整个初始化完成
 
-##### 交互式命令接口 #####
+#### 交互式命令接口 ####
 
 * el-get-cd 用dired切换到指定package的文件夹
 * el-get-install 根据用户设定的el-get-sources变量中的package来指定安装其中一个
 * el-get-update 升级指定的package
 * el-get-update-all 升级el-get-sources中的所有package，慎用
 * el-get-remove 删除已经安装而且在el-get-sources中的某个package
-* 加上`C-u`前缀的时候，el-get-install和el-get-remove是可以操作仓库中的所有package
+* 加上`C-u`前缀的时候，el-get-install和el-get-remove是可以操作仓库中的所有
+package
 
-##### 定制和贡献 #####
+#### 定制和贡献 ####
 
 * el-get支持本地扩展包仓库，参考el-get-recipe-path变量
-* 参考package描述文件的文档，对仓库中的package进行定制，可以改变来源、构建
-命令、 初始化函数。。。
+* 参考package描述文件的文档，对仓库中的package进行定制，可以改变来源、构建命令、
+初始化函数。。。
 * 参考el-get-methods的文档，给el-get增加更多的安装来源支持
 * 贡献package描述文件（package recipe），添加你喜欢的package
 * 使用并报告bug，或者要求增加新的特性
 * 让更多的人用上el-get
 
-### 资源和链接 ###
+# 资源和链接 #
 
 * el-get github地址:
 [https://github.com/dimitri/el-get](https://github.com/dimitri/el-get)
