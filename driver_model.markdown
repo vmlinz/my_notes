@@ -78,6 +78,8 @@ objects can replace fields in the bus-specific objects.
 - Step 1: Registering the bus driver. 使用bus\_register注册bus
 
 - Step 2: Registering Devices.注册总线类型的设备
+<br />.Initialize the device on registration.初始化通用设备。
+<br />.Register the device.注册通用设备。
 
 It is recommended that the generic device not be the first item in
 the struct to discourage programmers from doing mindless casts
@@ -87,7 +89,32 @@ should be created to convert from the generic object type.
 最好不要把通用设备结构放在设备类型的第一个成员，避免无脑的强转设备类型。
 应该使用宏或者inline函数来实现通用设备和特定设备类型的转换。
 
--  Initialize the device on registration.初始化通用设备。
--  Register the device.注册通用设备。
-
 - Step 3: Registering Drivers.注册驱动
+
+Embed a struct device_driver in the bus-specific driver.
+Initialize the generic driver structure.
+Register the driver.
+
+- Step 4: Define Generic Methods for Drivers.定义通用的驱动方法
+- Step 5: Support generic driver binding.提供通用的驱动绑定方法
+
+The model assumes that a device or driver can be dynamically
+registered with the bus at any time. When registration happens,
+devices must be bound to a driver, or drivers must be bound to all
+devices that it supports.
+驱动模型假定设备或者驱动可以在任意时刻被动态地注册到总线上。注册的时候，所有的设备必须绑定到一个驱动上，或者驱动必须绑定到所有它支持的设备上。
+
+  int (*match)(struct device * dev, struct device_driver * drv);
+
+- Step 6: Supply a hotplug callback.提供热插拔回调
+<br />.ACTION: set to 'add' or 'remove'
+<br />.DEVPATH: set to the device's physical path in sysfs.
+
+The driver model core passes several arguments to userspace via
+environment variables.
+
+- Step 7: Cleaning up the bus driver.清理总线驱动
+<br />Device list.
+int bus\_for\_each\_dev(struct bus\_type * bus, struct device * start, void * data, int (*fn)(struct device *, void *));
+<br />Driver list.
+int bus\_for\_each\_drv(struct bus_type * bus, struct device\_driver * start, void * data, int (*fn)(struct device\_driver *, void *));
