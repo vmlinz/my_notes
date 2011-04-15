@@ -259,3 +259,22 @@ environment variables.
 int bus\_for\_each\_dev(struct bus\_type * bus, struct device * start, void * data, int (*fn)(struct device *, void *));
 <br />Driver list.
 int bus\_for\_each\_drv(struct bus_type * bus, struct device\_driver * start, void * data, int (*fn)(struct device\_driver *, void *));
+
+## Platform Devices and Drivers ##
+
+See <linux/platform\_device.h> for the driver model interface to the
+platform bus:  platform\_device, and platform\_driver.  This pseudo-bus
+is used to connect devices on busses with minimal infrastructure,
+like those used to integrate peripherals on many system-on-chip
+processors, or some "legacy" PC interconnects; as opposed to large
+formally specified ones like PCI or USB.
+平台总线是一个虚拟总线，它被用于链接集成在SOC处理器总线上的设备。
+
+### Platform devices ###
+Platform devices are devices that typically appear as autonomous
+entities in the system. This includes legacy port-based devices and
+host bridges to peripheral buses, and most controllers integrated
+into system-on-chip platforms.  What they usually have in common
+is direct addressing from a CPU bus.  Rarely, a platform_device will
+be connected through a segment of some other kind of bus; but its
+registers will still be directly addressable.
