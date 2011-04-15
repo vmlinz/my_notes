@@ -184,7 +184,7 @@ physical directory to either its class directory, or the class's
 top-level directory. One can also be created to point to its driver's
 directory also.
 
-### driver_register ###
+### driver\_register ###
 
 The process is almost identical for when a new driver is added.
 The bus's list of devices is iterated over to find a match. Devices
@@ -232,7 +232,7 @@ should be created to convert from the generic object type.
 
 - Step 3: Registering Drivers.注册驱动
 
-Embed a struct device_driver in the bus-specific driver.
+Embed a struct device\_driver in the bus-specific driver.
 Initialize the generic driver structure.
 Register the driver.
 
@@ -245,7 +245,7 @@ devices must be bound to a driver, or drivers must be bound to all
 devices that it supports.
 驱动模型假定设备或者驱动可以在任意时刻被动态地注册到总线上。注册的时候，所有的设备必须绑定到一个驱动上，或者驱动必须绑定到所有它支持的设备上。
 
-  int (*match)(struct device * dev, struct device_driver * drv);
+  int (*match)(struct device * dev, struct device\_driver * drv);
 
 - Step 6: Supply a hotplug callback.提供热插拔回调
 <br />.ACTION: set to 'add' or 'remove'
@@ -258,7 +258,7 @@ environment variables.
 <br />Device list.
 int bus\_for\_each\_dev(struct bus\_type * bus, struct device * start, void * data, int (*fn)(struct device *, void *));
 <br />Driver list.
-int bus\_for\_each\_drv(struct bus_type * bus, struct device\_driver * start, void * data, int (*fn)(struct device\_driver *, void *));
+int bus\_for\_each\_drv(struct bus\_type * bus, struct device\_driver * start, void * data, int (*fn)(struct device\_driver *, void *));
 
 ## Platform Devices and Drivers ##
 
@@ -271,10 +271,47 @@ formally specified ones like PCI or USB.
 平台总线是一个虚拟总线，它被用于链接集成在SOC处理器总线上的设备。
 
 ### Platform devices ###
+
 Platform devices are devices that typically appear as autonomous
 entities in the system. This includes legacy port-based devices and
 host bridges to peripheral buses, and most controllers integrated
 into system-on-chip platforms.  What they usually have in common
-is direct addressing from a CPU bus.  Rarely, a platform_device will
+is direct addressing from a CPU bus.  Rarely, a platform\_device will
 be connected through a segment of some other kind of bus; but its
 registers will still be directly addressable.
+平台设备的一个共性就是他们都可以通过cpu总线直接寻址访问；即使偶尔通过其他类型的总线访问，此时设备的寄存器都是可以被直接寻址的。
+
+### Platform drivers ###
+Platform drivers follow the standard driver model convention, where
+discovery/enumeration is handled outside the drivers, and drivers
+provide probe() and remove() methods.  They support power management
+and shutdown notifications using the standard conventions.
+平台设备遵从标准的驱动模型惯例，驱动的发现和枚举发生在驱动程序以外，驱动负责提供probe()和remove()等方法。
+
+Platform drivers register themselves the normal way:
+- int platform\_driver\_register(struct platform\_driver *drv);
+
+### Device Enumeration ###
+As a rule, platform specific (and often board-specific) setup code will
+register platform devices:
+特定平台(特定板卡)的设置代码中注册平台设备是一个规则。
+
+.int platform\_device\_register(struct platform\_device *pdev);
+.int platform\_add\_devices(struct platform\_device **pdevs, int ndev);
+
+The general rule is to register only those devices that actually exist,
+but in some cases extra devices might be registered.  For example, a kernel
+might be configured to work with an external network adapter that might not
+be populated on all boards, or likewise to work with an integrated controller
+that some boards might not hook up to any peripherals.
+
+In some cases, boot firmware will export tables describing the devices
+that are populated on a given board.   Without such tables, often the
+only way for system setup code to set up the correct devices is to build
+a kernel for a specific target board.
+一些情况下，启动固件会导出给定开发板上提供的设备描述表。如果没有这种设备描述表，系统正确设置设备的唯一方法就是构建一个目标平台专用的内核。这种内核在嵌入式开发中比较常见。
+
+Driver binding is performed automatically by the driver core, invoking
+driver probe() after finding a match between device and driver.  If the
+probe() succeeds, the driver and device are bound as usual.
+驱动绑定是由驱动核心自动执行的，通过发现匹配的设备和驱动后调用驱动的probe()函数。如果probe()成功，驱动和设备就绑定起来了。
