@@ -97,7 +97,11 @@ very careful if they are not.
 
 kset只是一系列有关联的kobject集合。它们不必是同一个ktype，但是如果它们不是同一个ktype则需要非常仔细的处理它们。
 
+<<<<<<< HEAD
 #### kset的主要功能 ####
+=======
+kset的主要功能：
+>>>>>>> add newline
 
 - It serves as a bag containing a group of objects. A kset can be used by
   the kernel to track "all block devices" or "all PCI device drivers."
