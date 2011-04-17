@@ -1,4 +1,145 @@
 # Linux device driver model #
+
+## overview ##
+
+linux 设备模型的目的是为内核构建统一的模型，从而使系统有一般性的描述。
+
+设备模型的几个主要任务:
+
+* 电源管理和系统关机：设备模型使得操作系统能够以正确的顺序遍历关闭系统硬件
+* 和用户空间进行通讯：sysfs虚拟文件系统的实现和设备模型密切相关，并向用户空间展现了系统的结构
+* 设备模型：维护设备驱动的体系化数据机构
+* 对象的生命周期：设备模型的创建需要一系列的机制来处理对象的生命周期、对象之间的关系以及这些对象在用户空间的表示
+
+## kobject & kset ##
+
+* A kobject is an object of type struct kobject.  Kobjects have a name
+  and a reference count.  A kobject also has a parent pointer (allowing
+  objects to be arranged into hierarchies), a specific type, and,
+  usually, a representation in the sysfs virtual filesystem.
+  kobject是kobject结构的对象。kobject对象有名字和引用计数。
+* A ktype is the type of object that embeds a kobject.  Every structure
+  that embeds a kobject needs a corresponding ktype.  The ktype controls
+  what happens to the kobject when it is created and destroyed.
+  ktype是嵌入有kobject的对象的类型。每个嵌入了kobject的结构都需要一个相应的ktype类
+  型。ktype主要负责管理对象的创建和销毁。
+* A kset is a group of kobjects.  These kobjects can be of the same ktype
+  or belong to different ktypes.  The kset is the basic container type for
+  collections of kobjects. Ksets contain their own kobjects, but you can
+  safely ignore that implementation detail as the kset core code handles
+  this kobject automatically.
+  kset是一系列kobject对象的集合。这些对象可以是同一个ktype也可以属于不同的ktype。
+  kset是kobject对象的基本容器。kset自己本身也有自己的kobject对象。
+
+### Embedding kobjects  ###
+
+和内核链表一样，kobject很少被直接使用，一般都是嵌入其他结构。可以认为它是对象的基类。例如：
+`
+struct uio\_map {
+	struct kobject kobj;
+	struct uio_mem *mem;
+};
+`
+
+要取得嵌入其他结构体中的kobject，只需要直接取对应的成员变量即可；要通过kboject获取它所在的结构体则需要使用container_of宏。
+
+### kobjects的操作接口 ###
+
+`void kobject_init(struct kobject *kobj, struct kobj_type *ktype);`
+
+`int kobject_add(struct kobject *kobj, struct kobject *parent, const char *fmt, ...);
+`
+
+`int kobject_rename(struct kobject *kobj, const char *new_name);
+`
+
+`const char *kobject_name(const struct kobject * kobj);
+`
+
+`int kobject_init_and_add(struct kobject *kobj, struct kobj_type *ktype,
+			     struct kobject *parent, const char *fmt, ...);
+`
+### Uevents ###
+
+After a kobject has been registered with the kobject core, you need to
+announce to the world that it has been created.  This can be done with a
+call to kobject_uevent():
+kobject在核心中注册之后，你需要告知系统它被创建了。可以通过调用kobject\_uevent()来完成。
+
+`int kobject_uevent(struct kobject *kobj, enum kobject_action action);`
+
+### Reference counts ###
+
+One of the key functions of a kobject is to serve as a reference counter
+for the object in which it is embedded. As long as references to the object
+exist, the object (and the code which supports it) must continue to exist.
+The low-level functions for manipulating a kobject's reference counts are:
+kobject的一个主要功能之一就是作为嵌入对象的引用计数器。主要的操作方法如下：
+
+`struct kobject *kobject_get(struct kobject *kobj);`
+
+`void kobject_put(struct kobject *kobj);`
+
+Because kobjects are dynamic, they must not be declared statically or on
+the stack, but instead, always allocated dynamically.
+由于kobject对象是一个动态数据结构，所以它们不能被声明为静态或者在栈上分配，它们只能动态分配在堆上。
+
+### ktypes and release methods ###
+
+struct kobj_type结构中有kobject的release函数，用于销毁kobject。
+
+### ksets ###
+
+A kset is merely a collection of kobjects that want to be associated with
+each other.  There is no restriction that they be of the same ktype, but be
+very careful if they are not.
+
+kset只是一系列有关联的kobject集合。它们不必是同一个ktype，但是如果它们不是同一个ktype则需要非常仔细的处理它们。
+
+kset的主要功能：
+- It serves as a bag containing a group of objects. A kset can be used by
+  the kernel to track "all block devices" or "all PCI device drivers."
+
+- A kset is also a subdirectory in sysfs, where the associated kobjects
+  with the kset can show up.  Every kset contains a kobject which can be
+  set up to be the parent of other kobjects; the top-level directories of
+  the sysfs hierarchy are constructed in this way.
+
+- Ksets can support the "hotplugging" of kobjects and influence how
+  uevent events are reported to user space.支持热插拔，同时影响uevent如何被报告到用户空间。
+
+接口：
+
+`struct kset *kset_create_and_add(const char *name,
+				   struct kset_uevent_ops *u,
+				   struct kobject *parent);
+`
+
+`void kset_unregister(struct kset *kset);
+`
+
+If a kset wishes to control the uevent operations of the kobjects
+associated with it, it can use the struct kset_uevent_ops to handle it:
+通过uevent操作函数来控制和它相关的kobject。
+
+`struct kset_uevent_ops {
+	int (*filter)(struct kset *kset, struct kobject *kobj);
+	const char *(*name)(struct kset *kset, struct kobject *kobj);
+	int (*uevent)(struct kset *kset, struct kobject *kobj,
+		      struct kobj_uevent_env *env);
+};
+`
+
+### Kobject removal ###
+
+After a kobject has been registered with the kobject core successfully, it
+must be cleaned up when the code is finished with it.  To do that, call
+kobject\_put().  By doing this, the kobject core will automatically clean up
+all of the memory allocated by this kobject.  If a KOBJ\_ADD uevent has been
+sent for the object, a corresponding KOBJ\_REMOVE uevent will be sent, and
+any other sysfs housekeeping will be handled for the caller properly.
+kobject成功注册到核心之后，在使用它的代码结束后它必须被清理。通过调用kobject\_put()来实现。这样核心就会自动清除给这个kobject分配的内存。如果之前发送过KOBJ\_ADD事件，此时会发送相应的KOBJ\_REMOVE事件。
+
 ## driver binding ##
 
 驱动绑定是联系驱动和相应设备的一个过程。一般由总线驱动来完成这个绑定，因为总线结构里面有表示特定总线的驱动和设备的结构。通过使用通用的设备和驱动结构，大多数的绑定都可以用通用的代码来实现。
