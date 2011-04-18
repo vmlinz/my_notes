@@ -34,14 +34,15 @@ linux 设备模型的目的是为内核构建统一的模型，从而使系统�
 ### Embedding kobjects  ###
 
 和内核链表一样，kobject很少被直接使用，一般都是嵌入其他结构。可以认为它是对象的基类。例如：
+
 `
-struct uio\_map {
+struct uio_map {
 	struct kobject kobj;
 	struct uio_mem *mem;
 };
 `
 
-要取得嵌入其他结构体中的kobject，只需要直接取对应的成员变量即可；要通过kboject获取它所在的结构体则需要使用container_of宏。
+要取得嵌入其他结构体中的`kobject`，只需要直接取对应的成员变量即可；要通过`kboject`获取它所在的结构体则需要使用`container_of`宏。
 
 ### kobjects的操作接口 ###
 
@@ -63,8 +64,8 @@ struct uio\_map {
 
 After a kobject has been registered with the kobject core, you need to
 announce to the world that it has been created.  This can be done with a
-call to kobject_uevent():
-kobject在核心中注册之后，你需要告知系统它被创建了。可以通过调用kobject\_uevent()来完成。
+call to `kobject_uevent()`:
+kobject在核心中注册之后，你需要告知系统它被创建了。可以通过调用`kobject_uevent()`来完成。
 
 `int kobject_uevent(struct kobject *kobj, enum kobject_action action);`
 
@@ -86,7 +87,7 @@ the stack, but instead, always allocated dynamically.
 
 ### ktypes and release methods ###
 
-struct kobj_type结构中有kobject的release函数，用于销毁kobject。
+`struct kobj_type`结构中有kobject的release函数，用于销毁kobject。
 
 ### ksets ###
 
@@ -96,7 +97,8 @@ very careful if they are not.
 
 kset只是一系列有关联的kobject集合。它们不必是同一个ktype，但是如果它们不是同一个ktype则需要非常仔细的处理它们。
 
-kset的主要功能：
+#### kset的主要功能 ####
+
 - It serves as a bag containing a group of objects. A kset can be used by
   the kernel to track "all block devices" or "all PCI device drivers."
 
@@ -108,7 +110,7 @@ kset的主要功能：
 - Ksets can support the "hotplugging" of kobjects and influence how
   uevent events are reported to user space.支持热插拔，同时影响uevent如何被报告到用户空间。
 
-接口：
+#### 接口 ####
 
 `struct kset *kset_create_and_add(const char *name,
 				   struct kset_uevent_ops *u,
@@ -119,7 +121,7 @@ kset的主要功能：
 `
 
 If a kset wishes to control the uevent operations of the kobjects
-associated with it, it can use the struct kset_uevent_ops to handle it:
+associated with it, it can use the `struct kset_uevent_ops` to handle it:
 通过uevent操作函数来控制和它相关的kobject。
 
 `struct kset_uevent_ops {
@@ -134,11 +136,11 @@ associated with it, it can use the struct kset_uevent_ops to handle it:
 
 After a kobject has been registered with the kobject core successfully, it
 must be cleaned up when the code is finished with it.  To do that, call
-kobject\_put().  By doing this, the kobject core will automatically clean up
-all of the memory allocated by this kobject.  If a KOBJ\_ADD uevent has been
-sent for the object, a corresponding KOBJ\_REMOVE uevent will be sent, and
+`kobject_put()`.  By doing this, the kobject core will automatically clean up
+all of the memory allocated by this kobject.  If a `KOBJ_ADD` uevent has been
+sent for the object, a corresponding `KOBJ_REMOVE` uevent will be sent, and
 any other sysfs housekeeping will be handled for the caller properly.
-kobject成功注册到核心之后，在使用它的代码结束后它必须被清理。通过调用kobject\_put()来实现。这样核心就会自动清除给这个kobject分配的内存。如果之前发送过KOBJ\_ADD事件，此时会发送相应的KOBJ\_REMOVE事件。
+`kobject`成功注册到核心之后，在使用它的代码结束后它必须被清理。通过调用`kobject_put()`来实现。这样核心就会自动清除给这个`kobject`分配的内存。如果之前发送过`KOBJ_ADD`事件，此时会发送相应的`KOBJ_REMOVE`事件。
 
 ## driver binding ##
 
@@ -146,19 +148,20 @@ kobject成功注册到核心之后，在使用它的代码结束后它必须被�
 
 ### 总线 ###
 
-总线结构体里面有一个该总线上所有设备的链表，每当有新的设备插入即调用device_\register的时候，设备就会被添加到链表末尾。它里面还有该总线类型的驱动链表，当调用driver\_register的时候，驱动就会被添加到驱动链表当中。这些就是触发驱动绑定的事件。
+总线结构体里面有一个该总线上所有设备的链表，每当有新的设备插入即调用`device_register`的时候，设备就会被添加到链表末尾。它里面还有该总线类型的驱动链表，当调用`driver_register`的时候，驱动就会被添加到驱动链表当中。这些就是触发驱动绑定的事件。
 
 ### device\_register ###
 
 当添加新设备的时候，系统会遍历总线的驱动链表来查找支持该设备的驱动。为了确定这个，添加的ID必须是驱动支持的设备ID之一。这个匹配的函数是由总线驱动来提供的回调函数之一。如果匹配成功，该函数会返回1；失败则返回0。
 
-int match(struct device * dev, struct device\_driver * drv);
+`int match(struct device * dev, struct device_driver * drv);
+`
 
 如果能找到一个匹配的驱动，设备的驱动指针就被设置为该驱动，然后调用驱动的probe回调函数。这样驱动就可以进一步确定它是否支持该设备。
 
 ### Device Class ###
 
-如果探测成功，设备就被注册到它所属的设备类型(device class)上。devclass\_add\_device函数被调用来在设备类型上枚举这个设备，然后通过设备类型的register\_dev回调把设备实际注册到设备类型上。
+如果探测成功，设备就被注册到它所属的设备类型(device class)上。`devclass_add_device`函数被调用来在设备类型上枚举这个设备，然后通过设备类型的`register_dev`回调把设备实际注册到设备类型上。
 
 ### Driver ###
 
@@ -232,7 +235,7 @@ should be created to convert from the generic object type.
 
 - Step 3: Registering Drivers.注册驱动
 
-Embed a struct device\_driver in the bus-specific driver.
+Embed a `struct device_driver` in the bus-specific driver.
 Initialize the generic driver structure.
 Register the driver.
 
@@ -245,7 +248,7 @@ devices must be bound to a driver, or drivers must be bound to all
 devices that it supports.
 驱动模型假定设备或者驱动可以在任意时刻被动态地注册到总线上。注册的时候，所有的设备必须绑定到一个驱动上，或者驱动必须绑定到所有它支持的设备上。
 
-  int (*match)(struct device * dev, struct device\_driver * drv);
+  `int (*match)(struct device * dev, struct device_driver * drv);`
 
 - Step 6: Supply a hotplug callback.提供热插拔回调
 <br />.ACTION: set to 'add' or 'remove'
@@ -255,15 +258,13 @@ The driver model core passes several arguments to userspace via
 environment variables.
 
 - Step 7: Cleaning up the bus driver.清理总线驱动
-<br />Device list.
-int bus\_for\_each\_dev(struct bus\_type * bus, struct device * start, void * data, int (*fn)(struct device *, void *));
-<br />Driver list.
-int bus\_for\_each\_drv(struct bus\_type * bus, struct device\_driver * start, void * data, int (*fn)(struct device\_driver *, void *));
+<br />.`int bus_for_each_dev(struct bus_type * bus, struct device * start, void * data, int (*fn)(struct device *, void *));`
+<br />.`int bus_for_each_drv(struct bus_type * bus, struct device_driver * start, void * data, int (*fn)(struct device_driver *, void *));`
 
 ## Platform Devices and Drivers ##
 
-See <linux/platform\_device.h> for the driver model interface to the
-platform bus:  platform\_device, and platform\_driver.  This pseudo-bus
+See `<linux/platform_device.h>` for the driver model interface to the
+platform bus:  `platform_device`, and `platform_driver`.  This pseudo-bus
 is used to connect devices on busses with minimal infrastructure,
 like those used to integrate peripherals on many system-on-chip
 processors, or some "legacy" PC interconnects; as opposed to large
@@ -276,7 +277,7 @@ Platform devices are devices that typically appear as autonomous
 entities in the system. This includes legacy port-based devices and
 host bridges to peripheral buses, and most controllers integrated
 into system-on-chip platforms.  What they usually have in common
-is direct addressing from a CPU bus.  Rarely, a platform\_device will
+is direct addressing from a CPU bus.  Rarely, a `platform_device` will
 be connected through a segment of some other kind of bus; but its
 registers will still be directly addressable.
 平台设备的一个共性就是他们都可以通过cpu总线直接寻址访问；即使偶尔通过其他类型的总线访问，此时设备的寄存器都是可以被直接寻址的。
@@ -289,15 +290,16 @@ and shutdown notifications using the standard conventions.
 平台设备遵从标准的驱动模型惯例，驱动的发现和枚举发生在驱动程序以外，驱动负责提供probe()和remove()等方法。
 
 Platform drivers register themselves the normal way:
-- int platform\_driver\_register(struct platform\_driver *drv);
+
+- `int platform_driver_register(struct platform_driver *drv);`
 
 ### Device Enumeration ###
 As a rule, platform specific (and often board-specific) setup code will
 register platform devices:
 特定平台(特定板卡)的设置代码中注册平台设备是一个规则。
 
-.int platform\_device\_register(struct platform\_device *pdev);
-.int platform\_add\_devices(struct platform\_device **pdevs, int ndev);
+- `int platform_device_register(struct platform_device *pdev);`
+- `int platform_add_devices(struct platform_device **pdevs, int ndev);`
 
 The general rule is to register only those devices that actually exist,
 but in some cases extra devices might be registered.  For example, a kernel
