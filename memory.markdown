@@ -49,6 +49,9 @@ linux内核中有许多种不同的地址类型
 
 高端内存是没有直接映射到物理内存的内核逻辑地址
 
+- [HighMemory](http://linux-mm.org/HighMemory)
+
+
 #### 应对高端内存 ####
 
 * 高端物理内存在需要使用时会被临时映射到内核虚拟内存上
@@ -75,10 +78,25 @@ page结构和虚拟地址之间转换的函数和宏：
 * struct page \*pfn\_to\_page(int pfn);
 * void \*page_addr(struct page \*page);
 
-## 页表 ##
+## 分页 ##
+
+In a virtual memory system all of these addresses are virtual addresses and not physical addresses. These virtual addresses are converted into physical addresses by the processor based on information held in a set of tables maintained by the operating system.在虚拟内存系统中，所有的地址都是虚拟地址而不是物理地址。这些虚拟地址可以通过操作系统维护的一系列的表转换为物理地址。
+
+To make this translation easier, virtual and physical memory are divided into handy sized chunks called pages. These pages are all the same size, they need not be but if they were not, the system would be very hard to administer. Linux on Alpha AXP systems uses 8 Kbyte pages and on Intel x86 systems it uses 4 Kbyte pages. Each of these pages is given a unique number; the page frame number (PFN).为了使这个转换更加简单，虚拟地址和物理地址都被分成叫做内存页面小的内存块。所有的页面都是同样大小。每页内存都有一个唯一的编号，这种编号叫做页帧号。
+
+In this paged model, a virtual address is composed of two parts; an offset and a virtual page frame number. If the page size is 4 Kbytes, bits 11:0 of the virtual address contain the offset and bits 12 and above are the virtual page frame number. Each time the processor encounters a virtual address it must extract the offset and the virtual page frame number. The processor must translate the virtual page frame number into a physical one and then access the location at the correct offset into that physical page. To do this the processor uses page tables.在这种分页模式下，虚拟地址由两部分组成；页帧内的偏移和虚拟页帧号。如果页面大小是4KB，11:0这些位就是页帧内偏移，12位以上的叫做页帧号。每当处理器遇到虚拟内存地址，它就会把地址中的页内偏移和页帧号解出来。处理器通过页表把虚拟帧号转换成物理帧号，然后在加上页内偏移就可以找到对应的物理地址了。
+
+### 页表 ###
 
 现代系统中，处理器需要使用某种机制将虚拟地址转换成物理地址。这种机制被成为页表；它基本上是一个多层树形结构，结构化的数组中包含了虚拟地址到物理地址的映射和相关的标志位。
 
+### demand paging ###
+
+Linux uses demand paging to load executable images into a processes virtual memory. Whenever a command is executed, the file containing it is opened and its contents are mapped into the processes virtual memory. This is done by modifying the data structures describing this processes memory map and is known as memory mapping. However, only the first part of the image is actually brought into physical memory. The rest of the image is left on disk. As the image executes, it generates page faults and Linux uses the processes memory map in order to determine which parts of the image to bring into memory for execution.Linux使用按需分页来将可执行镜像载入到进程的虚拟内存空间。每当命令执行时，命令的文件被打开，内容被映射到进程的虚拟内存上。这里是通过修改进程的内存映射相关结构体来实现的，这个过程也叫做内存映射。不过，只有镜像的开头部分被真正的放进了物理内存。余下部分还在磁盘上。镜像执行的时候，它将持续的产生页面异常，linux通过进程的内存映射表来确定镜像的哪个部分需要被载入物理内存执行。
+
+### Shared virtual memory ###
+
+Virtual memory makes it easy for several processes to share memory. All memory access are made via page tables and each process has its own separate page table. For two processes sharing a physical page of memory, its physical page frame number must appear in a page table entry in both of their page tables. 虚拟内存使得多个进程共享内存更加简单。所有的内存访问都要通过页表来实现。对于共享一个物理页的两个进程来说，这个物理页面必须同时在两个进程的页表中都有相应的页表项。
 
 ## 虚拟内存区 ##
 
