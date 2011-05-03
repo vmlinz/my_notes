@@ -271,6 +271,34 @@ DMA缓冲区的主要问题是：当大于一页时，它必须占用连续的�
 
 int dma\_set\_mask(struct device *dev, u64 mask); 可以用来确定设备是否支持DMA。
 
+## 内存分配实现 ##
+
+下面将介绍linux内核中针对不同的应用场景实现的不同内存分配算法。
+
+- 页框分配，zoned buddy算法
+- 内存区分配，slab 分配器
+- 非连续内存区管理，虚拟内存映射
+
+在支持NUMA的linux内核当中，系统的物理内存被分为多个节点，在单独节点内，任一给定cpu访问页面所需要的时间都是相同的。每个节点的物理内存又分成多个内存区（zone）。x86下内存区有`ZONE_DMA`、`ZONE_NORMAL`和`ZONE_HIGHMEM`。x86_32系统上，`ZONE_HIGHMEM`中的内存没有直接映射到内核线性地址上，在每次使用之前都需要先设置页表映射内存。每个zone下面的内存都是以页框为单位来管理的。
+
+每个zone的内存页面是通过buddy算法来管理的。
+
+### zoned buddy ###
+
+页框分配算法需要解决external fragmentation的内存管理问题。linux内核使用buddy算法来解决这个问题。把所有的空闲页分组为2^(order-1)大小的块链表。order的最大值为11，所以一共有11个这样的链表。链表的元素最小的为4k(1一个页面大小)，最大的为4M(2^10个页面大小)。请求内存时，内核首先从最接近请求大小的链表中查询，如果有这样的空闲单元，则直接使用。如果没有则一次递增到更大块的内存链表中查询，如果有则将内存分出最接近请求大小的块，在把余下的内存拆分添加到较小的内存链表中。
+
+#### 核心函数 ####
+
+核心接口
+
+- `unsigned long __get_free_pages(gfp_t gfp_mask, unsigned int order);`
+- `struct page * alloc_pages(gfp_t gfp_mask, unsigned int order);`
+- `void __free_pages(struct page *page, unsigned int order);`
+
+核心实现
+
+- `struct page * __alloc_pages_nodemask(gfp_t gfp_mask, unsigned int order, struct zonelist *zonelist, nodemask_t *nodemask);`
+
 ### TODOS ###
 
 - paging
