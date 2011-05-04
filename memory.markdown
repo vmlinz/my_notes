@@ -299,10 +299,55 @@ int dma\_set\_mask(struct device *dev, u64 mask); 可以用来确定设备是否
 
 - `struct page * __alloc_pages_nodemask(gfp_t gfp_mask, unsigned int order, struct zonelist *zonelist, nodemask_t *nodemask);`
 
-### TODOS ###
+### Slab Allocator(对象缓存分配) ###
 
-- paging
+The fundamental idea behind slab allocation technique is based on the observation that some kernel data objects are frequently created and destroyed after they are not needed anymore. This implies that for each allocation of memory for these data objects, some time is spent to find the best fit for that data object. Moreover, deallocation of the memory after destruction of the object contributes to fragmentation of the memory, which burdens the kernel some more to rearrange the memory.Slab 算法的发现是基于内核中内存使用的一些特点：一些需要频繁使用的同样大小数据经常在使用后不久又再次被用到；找到合适大小的内存所消耗的时间远远大于释放内存所需要的时间。所以Slab算法的发明人认为内存对象在使用之后不是立即释放给系统而是将它们用链表之类的数据结构管理起来以备将来使用，频繁分配和释放的内存对象应该用缓存管理起来。Linux的slab分配器就是基于这样的想法实现的，这个算法在空间和时间上都有很高的效率。
+
+#### Slab implementation ####
+
+下面是Slab分配器中的主要数据结构之间的关系图。最上层是`cache_chain`，它是slab缓存的一个链表。这个链表用来查找需要分配内存大小的最佳匹配。链表中的元素是用来管理给定大小内存的一个缓存池指针`kmem_cache`。
+
+![Slab分配器的主要结构](http://www.ibm.com/developerworks/linux/library/l-linux-slab-allocator/figure1.gif)
+
+每个缓存对象包含了slab对象的链表。一个slab对象是一块连续内存（页面）。其中有三个slab对象链表：
+
+- `slabs_full`,完全分配好的slab对象链表
+- `slabs_partial`,部分分配好的slab对象链表
+- `slabs_empty`,空对象链表，slab对象都没有分配好
+
+其中空对象链表是内存回收的主要候选来源。slab链表上的对象是一块连续内存，这块内存被分成内存数据对象。这些数据对象是slab缓存上分配和释放的最小单位。
+
+由于数据对象是从slab上分配的，所以单个的slab可以从一个slab链表移动到另一个slab链表。比如当`slabs_partial`上的一个slab的内存对象全部被分配了之后，这个slab就从`slabs_partial`上移动到`slabs_full`。当`slabs_full`上的一个slab上的部分内存对象被释放之后，这个slab就从`slabs_full`链表移动到`slabs_partial`上，当这个slab上的所有内存对象都被释放之后，它就会再次移动到`slabs_empty`上。
+
+#### slab分配器带来的好处 ####
+
+- 通过缓存类似对象数据，内核中频繁的小数据对象的分配不会再消耗过多的时间，同时减少了系统的内存碎片
+- slab分配支持常用对象数据的初始化，减少了同类对象数据重复的初始化过程
+- slab分配支持硬件缓存对齐和着色，这样不同缓存下的对象数据可以使用同样的硬件缓存行，可以提高系统的性能
+
+#### 接口 ####
+
+- `struct kmem_cache *;`缓存指针，用于分配，释放缓存中的数据对象
+- `struct kmem_cache *kmem_cache_create( const char *name, size_t size,`
+  `size_t align, unsigned long flags,`
+  `void (*ctor)(void*, struct kmem_cache *, unsigned long),`
+  `void (*dtor)(void*, struct kmem_cache *, unsigned long));`创建缓存，`ctor`和`dtor`两个回调函数是提供给用户初始化和释放对象数据用的
+- `void kmem_cache_destroy( struct kmem_cache *cachep );`销毁缓存
+- `void* kmem_cache_alloc( struct kmem_cache *cachep, gfp_t flags );`从缓存中分配对象数据，其中的`flags`和`kmalloc`函数使用的标记一样，用于控制缓存内部从buddy system中分配内存页面的行为
+- `void kmem_cache_free( struct kmem_cache *cachep, void *objp );`回收数据到缓存中的slab对象
+
+- `void *kmalloc( size_t size, int flags );`kmalloc和前面的从缓存中分配对象数据一样，只不过它不需要提供一个特定的缓存，它通过遍历系统中可用的缓存来分配对象数据。这样我们终于知道kmalloc的实现了，它是slab分配器的一个接口
+- `void kfree( const void *objp );`
+
+#### further reading ####
+
+- [SLOB Allocator](http://en.wikipedia.org/wiki/SLOB)
+- [SLAB](http://en.wikipedia.org/wiki/Slab_allocation)
+- [SLUB](http://lwn.net/Articles/229984/)
+- [Anatomy of the Linux slab allocator](http://www.ibm.com/developerworks/linux/library/l-linux-slab-allocator/)
+
+## TODOS ##
+
 - segmentation
 - swaping
 - demand paging
-- buddy system & slab allocator(ULK3)
