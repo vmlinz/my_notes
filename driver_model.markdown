@@ -35,31 +35,26 @@ linux 设备模型的目的是为内核构建统一的模型，从而使系统�
 
 和内核链表一样，kobject很少被直接使用，一般都是嵌入其他结构。可以认为它是对象的基类。例如：
 
-`
-struct uio_map {
+`struct uio_map {`
 	struct kobject kobj;
 	struct uio_mem *mem;
-};
-`
+`};`
 
 要取得嵌入其他结构体中的`kobject`，只需要直接取对应的成员变量即可；要通过`kboject`获取它所在的结构体则需要使用`container_of`宏。
 
 ### kobjects的操作接口 ###
 
-`void kobject_init(struct kobject *kobj, struct kobj_type *ktype);`
+- `void kobject_init(struct kobject *kobj, struct kobj_type *ktype);`
 
-`int kobject_add(struct kobject *kobj, struct kobject *parent, const char *fmt, ...);
-`
+- `int kobject_add(struct kobject *kobj, struct kobject *parent, const char *fmt, ...);`
 
-`int kobject_rename(struct kobject *kobj, const char *new_name);
-`
+- `int kobject_rename(struct kobject *kobj, const char *new_name);`
 
-`const char *kobject_name(const struct kobject * kobj);
-`
+- `const char *kobject_name(const struct kobject * kobj);`
 
-`int kobject_init_and_add(struct kobject *kobj, struct kobj_type *ktype,
-			     struct kobject *parent, const char *fmt, ...);
-`
+- `int kobject_init_and_add(struct kobject *kobj, struct kobj_type *ktype,`
+`			     struct kobject *parent, const char *fmt, ...);`
+
 ### Uevents ###
 
 After a kobject has been registered with the kobject core, you need to
@@ -112,25 +107,22 @@ kset只是一系列有关联的kobject集合。它们不必是同一个ktype，�
 
 #### 接口 ####
 
-`struct kset *kset_create_and_add(const char *name,
+`struct kset *kset_create_and_add(const char *name,`
 				   struct kset_uevent_ops *u,
-				   struct kobject *parent);
-`
+`				   struct kobject *parent);`
 
-`void kset_unregister(struct kset *kset);
-`
+`void kset_unregister(struct kset *kset);`
 
 If a kset wishes to control the uevent operations of the kobjects
 associated with it, it can use the `struct kset_uevent_ops` to handle it:
 通过uevent操作函数来控制和它相关的kobject。
 
-`struct kset_uevent_ops {
+`struct kset_uevent_ops {`
 	int (*filter)(struct kset *kset, struct kobject *kobj);
 	const char *(*name)(struct kset *kset, struct kobject *kobj);
 	int (*uevent)(struct kset *kset, struct kobject *kobj,
 		      struct kobj_uevent_env *env);
-};
-`
+`};`
 
 ### Kobject removal ###
 

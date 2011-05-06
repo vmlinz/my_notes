@@ -59,14 +59,12 @@ sm的回调函数，当binder收到来自客户端的请求时，这个回调函
 
 下面的代码片段说明了sm在收到注册新服务时的处理过程：
 
-`
-case SVC_MGR_ADD_SERVICE:
+`case SVC_MGR_ADD_SERVICE:`
     s = bio_get_string16(msg, &len);
     ptr = bio_get_ref(msg);
     if (do_add_service(bs, s, len, ptr, txn->sender_euid))
 	return -1;
     break;
-`
 
 ### Service Providers ###
 
@@ -85,7 +83,9 @@ case SVC_MGR_ADD_SERVICE:
 * 客户端通过service代理对象完成rpc远程调用
 
 #### Android进程环境 ####
+
 ##### ProcessState #####
+
 android系统中的任何native进程要想使用binder机制，都必须要创建一个ProcessState对象和IPCThreadState对象。binder机制是整个android系统的基础，所以很有必要研究它的工作原理和方式。
 
 高焕堂先生有一篇《android框架底层结构知多少》的文章，里面有对ProcessState等类的一个大致解释。
@@ -94,8 +94,8 @@ ProcessState是一个singleton类，一个进程只能有一个类实例。它�
 
 下面的代码显示了ProcessState如何创建一个service代理对象：
 
-`sp<IBinder> ProcessState::getStrongProxyForHandle(int32_t handle)
-{
+`sp<IBinder> ProcessState::getStrongProxyForHandle(int32_t handle)`
+`{`
     sp<IBinder> result;
 
     AutoMutex _l(mLock);
@@ -122,8 +122,7 @@ ProcessState是一个singleton类，一个进程只能有一个类实例。它�
     }
 
     return result;
-}
-`
+`}`
 
 ##### IPCThtreadState #####
 
@@ -143,9 +142,9 @@ IPCThreadState类是ProcessState类的friend类，所以可以访问到它的私
 
 通过代码我们可以看出首先是通过IPCThreadState读写binder设备增加中相应binder句柄上的Service的引用计数。然后本地保存代理Service的binder句柄mHandle。客户进程对Service的请求都通过调用BpBinder的transact方法来完成。
 
-status_t BpBinder::transact(
+`status_t BpBinder::transact(`
     uint32_t code, const Parcel& data, Parcel* reply, uint32_t flags)
-{
+`{`
     // Once a binder has died, it will never come back to life.
     if (mAlive) {
 	status_t status = IPCThreadState::self()->transact(
@@ -155,14 +154,14 @@ status_t BpBinder::transact(
     }
 
     return DEAD_OBJECT;
-}
+`}`
 
 #### ServiceManager代理 ####
 
-libbinder中有一个全局函数defaultServiceManager可以是进程在C/C++空间获取到ServiceManager的代理。
+libbinder中有一个全局函数defaultServiceManager可以在进程C/C++空间获取到ServiceManager的代理。
 
-`sp<IServiceManager> defaultServiceManager()
-{
+`sp<IServiceManager> defaultServiceManager()`
+`{`
     if (gDefaultServiceManager != NULL) return gDefaultServiceManager;
 
     {
@@ -174,20 +173,18 @@ libbinder中有一个全局函数defaultServiceManager可以是进程在C/C++空
     }
 
     return gDefaultServiceManager;
-}
-`
+`}`
 
 调用getContextObject来得到servicemanager的IBinder。
 
-`sp<IBinder> ProcessState::getContextObject(const sp<IBinder>& caller)
-{
+`sp<IBinder> ProcessState::getContextObject(const sp<IBinder>& caller)`
+`{`
     if (supportsProcesses()) {
 	return getStrongProxyForHandle(0);
     } else {
 	return getContextObject(String16("default"), caller);
     }
-}
-`
+`}`
 
 然后系统通过interface_cast<IServiceManager>将IBinder转换为IServiceManager的引用。这里需要参考IServiceManager的源代码。
 
@@ -200,6 +197,7 @@ Android为了使开发者透明的使用binder机制而不用直接操作binder�
 * 客户端发送请求给服务器进程，调用接口的Service代理对象IBinder接口的transact方法。
 * Android系统Binder机制将负责把用户的请求，调用Service对象IBinder接口的onTransact方法。具体实现我们将在以后介绍Service的时候讨论。
 * IBinder对象还是比较底层的binder封装，实际在使用的时候，我们更倾向于使用native对象和proxy对象的共同interface，这样看起来更象是rpc调用。
+
 ### Clients ###
 
 客户端一般是android系统上的普通应用程序，它可以通过和binder通信来远程调用服务器进程的功能。
@@ -221,11 +219,11 @@ java binder使用和c/c++层的同样的binder封装，它的最终实现都是�
  - ServiceManagerNative.java
  - BinderInternal.java
 * 函数调用路径：
- - ServiceManager.getIServiceManager();
- - ServiceManagerNative.asInterface(IBinder obj);将IBinder对象转为Interface
- - BinderInternal.getContextObject();
- - native IBinder getContextObject();jni native函数声明
- - android\_os\_BinderInternal\_getContextObject(JNIEnv* env, jobject clazz);实现
+ - `ServiceManager.getIServiceManager();`
+ - `ServiceManagerNative.asInterface(IBinder obj);`将IBinder对象转为Interface
+ - `BinderInternal.getContextObject();`
+ - `native IBinder getContextObject();`jni native函数声明
+ - `android_os_BinderInternal_getContextObject(JNIEnv* env, jobject clazz);`实现
 
 #### 从SM获取其他服务 ####
 
@@ -235,11 +233,11 @@ java binder使用和c/c++层的同样的binder封装，它的最终实现都是�
  - ServiceManager.java
  - ServiceManagerNative.java
 * 函数调用路径：
- - ServiceManager.getService(Context.NETWORKMANAGEMENT\_SERVICE);
- - ServiceManagerProxy.getService();
- - IBinder.transact();
- - Parcel.readStrongBinder();
- - jobject android\_os\_Parcel\_readStrongBinder();
+ - `ServiceManager.getService(Context.NETWORKMANAGEMENT_SERVICE);`
+ - `ServiceManagerProxy.getService();`
+ - `IBinder.transact();`
+ - `Parcel.readStrongBinder();`
+ - `jobject android_os_Parcel_readStrongBinder();`
 
 # Android Middleware #
 # Android Linux Kernel #
