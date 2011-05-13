@@ -4,6 +4,8 @@
 
 ## introduction to assembly ##
 
+Liberty means responsibility.  That is why most men dread it.  ~George Bernard Shaw, Man and Superman, "Maxims: Liberty and Equality," 1905
+
 计算机程序语言从底层往上大致可以分为4个类型：机器语言，汇编语言，编译语言(c/c++),解释语言(java,php,python)。越是高级的语言越接近人类的思维，表达能力越强，程序的移植性越好，运行时代价越高；汇编的好处就是让你编写更适合机器，运行更快的代码。汇编语言和机器语言是等价的，它是机器语言的助记符。通过汇编你可以得到cpu的完全控制能力，你可以享受完全的自由。但是请记住，享受自由意味着你需要完全对自由负责。也可以这么认为，使用汇编语言你可以做任何事情，但是你得做所有事情。
 
 ### reasons to learn asm ###
@@ -77,7 +79,7 @@ arm 主要有3个跳转指令
 - b 简单的段内跳转
 - bl 函数调用跳转
 - bx 切换模式跳转 跳转的同时切换arm 指令模式(arm thumb)
-- gcc 中使用`.L`前缀来标示普通的标签，函数或其他有具体意义的标签则不用前缀
+- gcc 中使用`.L`前缀来标示内部标签，函数或其他有具体意义的符号则不用前缀
 
 arm 有4个状态标志，保存在cpsr和spsr中。
 
@@ -94,6 +96,51 @@ arm 有4个状态标志，保存在cpsr和spsr中。
 - 其他寄存器则需要在函数调用前后保持一致
 
 ## thumb instructions ##
+
+thumb 指令更短，只有16位。在通过16位bus读取的时候可以直接执行，32位指令则需要等到获取到指令的第二半之后才能执行。thumb 指令和arm 指令很类似，学会arm 指令之后，你只要知道thumb 不能做什么就可以了。接下来就是thumb 指令和arm 指令的区别，
+
+- 有些指令不存在 比如，rsb
+- 新指令 pop，push
+- 没有条件码，除了跳转(b)指令
+- 受限的寄存器访问 一般情况thumb 只能访问r0-r7
+- 设置状态一直开启 执行sub就相当于subs，它会设置状态标志
+- 位移指令被单独取出来，不能在直接结合Op2使用了
+- 没有立即数和Op2 有例外，请参考指令手册
+- 没有寄存器回写模式 内存访问指令没有回写模式了
+
 ## gnu assembler ##
-## examples ##
+
+arm cpu指令只是arm 汇编功能的一部分，你还需要汇编器指令来控制代码段，对齐以及创建变量等等。汇编器指令通常和特定的汇编器相关，一般不可移植。本节主要介绍一些GNU AS的汇编器指令，要更详细的资料，请参考GNU AS的手册。
+
+### symbols ###
+
+数据和函数被统称为符号，和c 一样，它们有声明和定义。标签很可能是一个符号。最好把局部的符号和全局的符号区别开，`.global lname`将符号声明为全局，这样其他文件就可以访问这个符号了。按照惯例，局部标签由`.L`开始。要使用外部符号，需要使用`.extern lname`声明符号是外部定义的(相当于c 语言的`extern`关键字)。
+
+- `.type, str` 用来说明标签的类型，比如函数(str=%function)
+- `.code n` 用来说明这段标签的指令类型是arm 还是thumb
+- `.thumb_func` 指定下一个标签的thumb 函数可以和c互相连接
+- `.align n` 让下一个指令对齐到2^n地址
+- `.extern lname` 声明符号为外部定义的符号
+- `.global lname` 声明符号为全局符号
+
+GAS默认未明确标示的符号为外部符号，这点和c 语言默认全局符号一样，破坏了代码的局部性。
+
+### definition of variables ###
+
+数据定义的主要汇编器指令, `.byte` `.word` `.hword` `.float` `.string`
+
+### data sections ###
+
+数据段定义主要用来给连接器提供信息，让它根据链接脚本将数据放在合适的位置， `.text` `.data` `.section secname, "flags", %type` `.bss`
+
+了解这些汇编器指令之后你就可以创建函数，声明定义变量甚至还可以把它们放在合适的位置，可以应付多数情况了。余下的指令你只要参考GAS的手册或者去读一些GCC生成的汇编代码就可以解决了。
+
 ## resources ##
+
+- [arm architecture](http://en.wikipedia.org/wiki/ARM_architecture)
+- [tour of arm asm](http://www.coranac.com/tonc/text/asm.htm)
+- [misc arm assembly](http://www.heyrick.co.uk/assembler/)
+- [resources to learn arm asm](http://stackoverflow.com/questions/270078/resources-for-learning-arm-assembly)
+- [eabi introduction on debian wiki](http://wiki.debian.org/ArmEabiPort#In_a_nutshell)
+- [arm faq](http://www.codesourcery.com/sgpp/lite/arm/portal/target_arch?@action=faq&target_arch=arm)
+- [arm docs](http://infocenter.arm.com/help/index.jsp)
