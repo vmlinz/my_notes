@@ -43,10 +43,9 @@ arm核支持两个指令集：arm和thumb（很形象，arm是手臂，thumb是�
 
 ### data instructions ###
 
-arm 中用于执行算术和逻辑操作的指令。arm 和其他体系结构不同，它只能在寄存器上处理数据，处理内存数据要先载入到寄存器上。指令结构：
+arm 中用于执行算术和逻辑操作的指令。arm 和其他体系结构不同，它只能在寄存器上处理数据，处理内存数据要先载入到寄存器上。
 
-op{cond}{s} Rd, Rn, Op2 cond和s是指令后缀，rd是目标寄存器，rn是第一操作寄存器，op2是第二操作数，arm 指令中最灵活的地方就是第二操作数。
-
+- 指令结构 `op{cond}{s} Rd, Rn, Op2 cond`和s是指令后缀，rd是目标寄存器，rn是第一操作寄存器，op2是第二操作数，arm 指令中最灵活的地方就是第二操作数。
 - 算术操作 add, adc, sub, sbc, rsb, rsc
 - 位操作 and, bic, eor, mov, mvn, orr
 - 状态操作 cmp, cmn, teq, tst 他们可以设置cpsr中的某些位
@@ -55,7 +54,7 @@ op{cond}{s} Rd, Rn, Op2 cond和s是指令后缀，rd是目标寄存器，rn是�
 ### memory instructions ###
 
 - 内存操作分为两种 str(保存寄存器到内存)和ldr(加载内存到寄存器)
-- 指令结构 op{cond}{type} Rd, [Rn, Op2] type是指定传输的内存单位，比如字，半子，字节等。
+- 指令结构 `op{cond}{type} Rd, [Rn, Op2]` type是指定传输的内存单位，比如字，半子，字节等。
 
 #### 寻址模式 ####
 
@@ -65,11 +64,34 @@ op{cond}{s} Rd, Rn, Op2 cond和s是指令后缀，rd是目标寄存器，rn是�
 
 #### 块传输 ####
 
-- 指令结构 op{cond}{mode} Rd{!}, {Rlist}
-- ldm stm
+- 指令结构 `op{cond}{mode} Rd{!}, {Rlist}`
+- ldm stm 保存和加载寄存器
 - mode分为IA IB DA DB 控制索引增加减少，索引变化和访问内存的先后顺序
 - 堆栈操作ED EI FD FI AAPCS 中使用FD 这种堆栈(满递减)，stmfd和ldmfd相当于使用stmdb和ldmia来操作堆栈
 - `ldmia r0, {r4-r7}` `ldmfd r0 {r4-r7}`
+
+### branching ###
+
+arm 主要有3个跳转指令
+
+- b 简单的段内跳转
+- bl 函数调用跳转
+- bx 切换模式跳转 跳转的同时切换arm 指令模式(arm thumb)
+- gcc 中使用`.L`前缀来标示普通的标签，函数或其他有具体意义的标签则不用前缀
+
+arm 有4个状态标志，保存在cpsr和spsr中。
+
+- Z 操作结果为0
+- N 负数
+- C 进位(unsigned overflow)
+- V 溢出(signed overflow) 两个大的正数相加溢出成负数
+
+函数调用，实践中你需要遵从AAPCS 来使你写的代码能很好的和遵从该标准的编译器生成的代码正常交互。
+
+- 前4个参数用r0-r3来存放，其他的参数按出现顺序入栈
+- 返回值保存到r0
+- r0-r3和r12这样的临时寄存器在调用过程中是随时变化的，可以随便使用，也不用保存
+- 其他寄存器则需要在函数调用前后保持一致
 
 ## thumb instructions ##
 ## gnu assembler ##
