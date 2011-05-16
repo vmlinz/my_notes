@@ -1,29 +1,41 @@
-# Driver basics #
+# 0.Driver basics #
 
 notes on linux kernel driver basics
 
-## development environment ##
+## 0.what's kernel module ##
+
+	What exactly is a kernel module? Modules are pieces of code that can be
+	loaded and unloaded into the kernel upon demand. They extend the functio
+	nality of the kernel without the need to reboot the system. For example,
+	one type of module is the device driver, which allows the kernel to acce
+	ss hardware connected to the system. Without modules, we would have to b
+	uild monolithic kernels and add new functionality directly into the kern
+	el image. Besides having larger kernels, this has the disadvantage of re
+	quiring us to rebuild and reboot the kernel every time we want new funct
+	ionality.
+
+## 1.development environment ##
 
 linux kernel development environment
 
-- building tools: gcc, make, modutils etc.
+- 1.0.building tools: gcc, make, modutils etc.
 
-- download linux kernel source tree:
+- 1.1.download linux kernel source tree:
 
 	git clone git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux-2
 	.6.git
 
-## building a module ##
+## 2.building a module ##
 
 process to build a linux kernel module
 
-### prerequisites ###
+### 2.0.prerequisites ###
 
 - build tools
 - kernel source tree
 - build for your running kernel
 
-### intro to kbuild system ###
+### 2.1.intro to kbuild system ###
 
 Linux uses kbuild system to build its source code. The kbuild system simplifies the build process. Refer `Documentation/kbuild` to get more information.
 
@@ -43,7 +55,7 @@ Linux uses kbuild system to build its source code. The kbuild system simplifies 
 
 	make -C /lib/modules/$(shell uname -r)/build M=$PWD modules
 
-## running a module ##
+## 3.running a module ##
 
 The kbuild system specifies how to build a linux
 
@@ -51,6 +63,6 @@ The kbuild system specifies how to build a linux
 
 	install kernel modules into kernel memory
 
-## the very "hello world" module ##
+## 4.the very "hello world" module ##
 
 See my source code and run it
