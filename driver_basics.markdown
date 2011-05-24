@@ -156,3 +156,10 @@ kernel use major number to identify a driver for a type of device, minor number 
 - unregister char device
 - implement fields of struct file_operations(open, release and read)
 - module ref count and module cleanup
+
+## 2.block device driver ##
+
+### 2.0.块设备的主要特点 ###
+### 2.1.块设备的主要数据结构 ###
+### 2.2.块设备的初始化过程 ###
+### 2.3.块设备的简单例子 ###
