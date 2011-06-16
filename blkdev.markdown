@@ -23,6 +23,8 @@
 
 * `struct bio` 用于描述块设备传输的最小单元，它主要描述了单次传输的开始扇区和传输的大小。
 
+* `struct hd_geometry` 用于描述磁盘的各种参数，包括磁头数，每磁道扇区数，磁道数
+
 ## 块设备的初始化过程 ##
 
 * `register_blkdev` 分配块设备需要的设备号。
@@ -34,5 +36,10 @@
 
 块设备的请求是驱动的核心。
 
+### 文件系统调用过程 ###
+### 块设备请求过程 ###
+### 通用块设备层 ###
+
 ## 资源和链接 ##
+[磁盘设备相关参数](http://en.wikipedia.org/wiki/Cylinder-head-sector)
 [块设备驱动分析，基于sbull](http://www.cnblogs.com/civet/archive/2011/03/14/1983899.html)
