@@ -157,8 +157,10 @@ kernel use major number to identify a driver for a type of device, minor number 
 - implement fields of struct file_operations(open, release and read)
 - module ref count and module cleanup
 
-# 2.Sessions #
-## 2.0.Kernel module programming  ##
-## 2.1.Different types of kernel driver ##
-## 2.2.Advanced Kernel programming utils like spinlocks ##
-## 2.3.Kernel driver model ##
+## 2.block device driver ##
+
+### 2.0.块设备的主要特点 ###
+### 2.1.块设备的主要数据结构 ###
+### 2.2.块设备的初始化过程 ###
+### 2.3.块设备的简单例子 ###
+
