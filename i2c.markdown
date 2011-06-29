@@ -35,8 +35,13 @@ i2c(IIC, 读作/ˈaɪ skwɛərd ˈsiː/或者/ˈaɪ tuː ˈsiː/) 的意思是in
 * `int i2c_register_driver(struct module *, struct i2c_driver *);` 注册设备驱动
 * `void i2c_del_driver(struct i2c_driver *);` 删除设备驱动
 
+## i2c 设备和驱动匹配 ##
+
+* `int i2c_register_driver(struct module *, struct i2c_driver *);` 阅读这个函数来理解i2c 设备和驱动的动态绑定过程，其中分成两种情况。一种是类似于驱动模型的probe 过程，另一种是调用attach函数。
+
 ## i2c 相关的资源和链接 ##
 
 * [i2c wiki](http://en.wikipedia.org/wiki/I%C2%B2C)
 * [i2c 协议](http://git.kernel.org/?p=linux/kernel/git/torvalds/linux-2.6.git;a=blob;f=Documentation/i2c/i2c-protocol)
 * [i2c 驱动架构分析](http://blog.csdn.net/hongjiujing/archive/2009/04/21/4098547.aspx)
+* [i2c 总线官方网站](http://www.i2c-bus.org/)
