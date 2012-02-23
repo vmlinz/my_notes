@@ -1,6 +1,63 @@
 # Android SDK Core #
 
 Notes on android sdk applications development, mainly about application components and anything interesting to android application development.
+
+## Android Fundamentals ##
+
+Android application fundamentals.
+
+* The core framework components that define your application.
+* The manifest file in which you declare components and required device features for your application.
+* Resources that are separate from the application code and allow your application to gracefully optimize its behavior for a variety of device configurations.
+
+### Activities ###
+
+#### Managing the Activity Lifecycle ####
+
+Managing the lifecycle of your activities by implementing callback methods is crucial to developing a strong and flexible application. The lifecycle of an activity is directly affected by its association with other activities, its task and back stack.
+
+An activity can exist in essentially three states:
+
+* Resumed
+
+> The activity is in the foreground of the screen and has user focus. (This state is also sometimes referred to as "running".)
+
+* Paused
+
+> Another activity is in the foreground and has focus, but this one is still visible. That is, another activity is visible on top of this one and that activity is partially transparent or doesn't cover the entire screen. A paused activity is completely alive (the Activity object is retained in memory, it maintains all state and member information, and remains attached to the window manager), but can be killed by the system in extremely low memory situations.
+
+* Stopped
+
+> The activity is completely obscured by another activity (the activity is now in the "background"). A stopped activity is also still alive (the Activity object is retained in memory, it maintains all state and member information, but is not attached to the window manager). However, it is no longer visible to the user and it can be killed by the system when memory is needed elsewhere.
+
+If an activity is paused or stopped, the system can drop it from memory either by asking it to finish (calling its finish() method), or simply killing its process. When the activity is opened again (after being finished or killed), it must be created all over.
+
+![Activity Lifecycle](./activity_lifecycle.png)
+
+### The Manifest file ###
+
+Before the Android system can start an application component, the system must know that the component exists by reading the application's AndroidManifest.xml file (the "manifest" file). Your application must declare all its components in this file, which must be at the root of the application project directory.
+
+The manifest does a number of things in addition to declaring the application's components, such as:
+
+* Identify any user permissions the application requires, such as Internet access or read-access to the user's contacts.
+* Declare the minimum API Level required by the application, based on which APIs the application uses.
+* Declare hardware and software features used or required by the application, such as a camera, bluetooth services, or a multitouch screen.
+API libraries the application needs to be linked against (other than the Android framework APIs), such as the Google Maps library.
+* And more
+
+#### <activity> ####
+
+activity have 4 different launch mode in 2 groups, regarding whether the acitvity can be lauched times.
+
+>`android:launchMode=["multiple" | "singleTop" | "singleTask" | "singleInstance"]`
+
+### Application Resources ###
+
+Android project have a res dir for resources needed for the application, including images, audio files, and anything relating to the visual presentation of the application. And they are compiled into an `R` class so you can use them in your code.
+
+For every resource that you include in your Android project, the SDK build tools define a unique integer ID, which you can use to reference the resource from your application code or from other resources defined in XML. For example, if your application contains an image file named logo.png (saved in the res/drawable/ directory), the SDK tools generate a resource ID named R.drawable.logo, which you can use to reference the image and insert it in your user interface.
+
 # Android Framework #
 
 Core native libs for the android framework, notes on understanding of these libs to get an overview of the whole system.
