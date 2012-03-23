@@ -32,7 +32,10 @@ An activity can exist in essentially three states:
 
 If an activity is paused or stopped, the system can drop it from memory either by asking it to finish (calling its finish() method), or simply killing its process. When the activity is opened again (after being finished or killed), it must be created all over.
 
+> NOTE: You should use onPause() to write crucial persistent data (such as user edits) to storage. However, you should be selective about what information must be retained during onPause(), because any blocking procedures in this method block the transition to the next activity and slow the user experience.
+
 ![Activity Lifecycle](./activity_lifecycle.png)
+
 
 ### The Manifest file ###
 
