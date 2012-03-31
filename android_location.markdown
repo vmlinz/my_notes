@@ -1,0 +1,63 @@
+# Location Hal Implementation #
+
+Android location HAL utilizes the android HAL framework to implement a hardware and kernel independent module. When porting or implementing GPS feature on Android platform, you just need to implement several standard GPS HAL interfaces defined by Android. So that when android framework initializes, it will new a thread for location manager service, and load gps HAL shared library and call the interface functions you provided at the proper time.
+
+With Android location HAL, we don't have to care about how the framework works, so we just focus on implementing the interfaces defined by location HAL, then the location manager service will work as expected.
+
+## HAL ##
+
+refer to [HAL implementation](hal.markdown)
+
+## Location Manager Service ##
+
+Android location architecture
+
+![location architecture](location_arch.jpeg)
+
+Android location manager service initializition
+
+![location manager service](location_init.jpeg)
+
+## Location HAL Interfaces ##
+
+> com_android_server_location_GpsLocationProvider.cpp implements the interfaces between location manager service and HAL module.
+
+> {"native_init", "()Z", (void*)android_location_GpsLocationProvider_init} exports the HAL init function to java framework. when this function is called, hal module will be load into memory and return `GpsInterface` struct to jni with gps callbacks pointing to the real implementations in hal.
+
+> {"native_start", "()Z", (void*)android_location_GpsLocationProvider_start} android provider will call this native function which is implemented in location hal which will start gps hardware for location.
+
+> after android java framework call into hal to start location, then the location thread will call the callback functions provided to report location changes to android java framework, so the application have a chance to know the location changes and so on.
+
+## Driver Interfaces ##
+
+So according to sample gps implementation for us, the kernel part should provide us at least these interfaces:
+
+* gps serial device interface
+> device node: /dev/ttyS0 or something else
+> standard file operations like open, close, read, write
+> read function will give us standard nmea data line by line
+> write function give us a standard interface to control gps hardware
+
+* gps control, provide us a function or ioctl to power on/off gps hardware
+> gps_state_start
+> gps_state_stop
+
+* gps transport attributes like message rate and baud rate
+> gps_dev_set_nmea_message_rate
+> gps_dev_set_baud_rate
+
+## Files ##
+
+* location provider jni `(frameworks/base/services/jni/com_android_server_location_GpsLocationProvider.cpp)`
+
+* location provider `(frameworks/base/services/java/com/android/server/location/GpsLocationProvider.java)`
+
+* location manager service `(frameworks/base/services/java/com/android/server/LocationManagerService.java)`
+
+* [freerunner_gps.c](http://git.android-x86.org/?p=platform/hardware/gps.git;a=blob;f=gps.c;h=199de46e7708262b37a61ad1706e7cde93ebccd7;hb=c044569632a80c01f032c8726e783e3728c2d5cc)
+
+## Resources ##
+
+> [Android GPS Analysis](http://hi.baidu.com/%CB%EF%CC%EF%BB%AA/blog/item/60ff6e2964bc4921359bf732.html)
+> [Android GPS HAL](http://blog.chinaunix.net/space.php?uid=20485710&do=blog&id=1666975)
+> [Android HAL Introduction](http://www.slideshare.net/jollen/android-hal-introduction-libhardware-and-its-legacy)
