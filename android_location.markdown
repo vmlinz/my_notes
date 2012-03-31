@@ -6,17 +6,17 @@ With Android location HAL, we don't have to care about how the framework works, 
 
 ## HAL ##
 
-refer to [HAL implementation](hal.markdown)
+Please refer to [HAL implementation](hal.markdown)
 
 ## Location Manager Service ##
 
 Android location architecture
 
-![location architecture](location_arch.jpeg)
+![location architecture](https://github.com/vmlinz/my_notes/raw/master/location_arch.jpeg)
 
 Android location manager service initializition
 
-![location manager service](location_init.jpeg)
+![location manager service](https://github.com/vmlinz/my_notes/raw/master/location_init.jpeg)
 
 ## Location HAL Interfaces ##
 
@@ -34,10 +34,10 @@ So according to sample gps implementation for us, the kernel part should provide
 
 ### gps serial device interface ###
 
-* device node: /dev/ttyS0 or something else
-* standard file operations like open, close, read, write
-* read function will give us standard nmea data line by line
-* write function give us a standard interface to control gps hardware
+* device node: `/dev/ttyS0 or something else`
+* standard file operations like `open, close, read, write`
+* **read function** will give us standard nmea data line by line
+* **write function** give us a standard interface to control gps hardware
 
 ### gps control, provide us a function or ioctl to power on/off gps hardware ###
 
@@ -52,11 +52,8 @@ So according to sample gps implementation for us, the kernel part should provide
 ## Files ##
 
 * location provider jni `(frameworks/base/services/jni/com_android_server_location_GpsLocationProvider.cpp)`
-
 * location provider `(frameworks/base/services/java/com/android/server/location/GpsLocationProvider.java)`
-
 * location manager service `(frameworks/base/services/java/com/android/server/LocationManagerService.java)`
-
 * [freerunner_gps.c](http://git.android-x86.org/?p=platform/hardware/gps.git;a=blob;f=gps.c;h=199de46e7708262b37a61ad1706e7cde93ebccd7;hb=c044569632a80c01f032c8726e783e3728c2d5cc)
 
 ## Resources ##
