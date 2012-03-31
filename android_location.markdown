@@ -32,19 +32,22 @@ Android location manager service initializition
 
 So according to sample gps implementation for us, the kernel part should provide us at least these interfaces:
 
-* gps serial device interface
-> device node: /dev/ttyS0 or something else
-> standard file operations like open, close, read, write
-> read function will give us standard nmea data line by line
-> write function give us a standard interface to control gps hardware
+### gps serial device interface ###
 
-* gps control, provide us a function or ioctl to power on/off gps hardware
-> gps_state_start
-> gps_state_stop
+* device node: /dev/ttyS0 or something else
+* standard file operations like open, close, read, write
+* read function will give us standard nmea data line by line
+* write function give us a standard interface to control gps hardware
 
-* gps transport attributes like message rate and baud rate
-> gps_dev_set_nmea_message_rate
-> gps_dev_set_baud_rate
+### gps control, provide us a function or ioctl to power on/off gps hardware ###
+
+* `gps_state_start`
+* `gps_state_stop`
+
+### gps transport attributes like message rate and baud rate ###
+
+* `gps_dev_set_nmea_message_rate`
+* `gps_dev_set_baud_rate`
 
 ## Files ##
 
@@ -58,6 +61,6 @@ So according to sample gps implementation for us, the kernel part should provide
 
 ## Resources ##
 
-> [Android GPS Analysis](http://hi.baidu.com/%CB%EF%CC%EF%BB%AA/blog/item/60ff6e2964bc4921359bf732.html)
-> [Android GPS HAL](http://blog.chinaunix.net/space.php?uid=20485710&do=blog&id=1666975)
-> [Android HAL Introduction](http://www.slideshare.net/jollen/android-hal-introduction-libhardware-and-its-legacy)
+* [Android GPS Analysis](http://hi.baidu.com/%CB%EF%CC%EF%BB%AA/blog/item/60ff6e2964bc4921359bf732.html)
+* [Android GPS HAL](http://blog.chinaunix.net/space.php?uid=20485710&do=blog&id=1666975)
+* [Android HAL Introduction](http://www.slideshare.net/jollen/android-hal-introduction-libhardware-and-its-legacy)
