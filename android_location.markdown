@@ -20,13 +20,13 @@ Please refer to [HAL implementation](hal.markdown)
 
 ## Location HAL Interfaces ##
 
-* `com_android_server_location_GpsLocationProvider.cpp implements the interfaces between location manager service and HAL module.`
+* `com_android_server_location_GpsLocationProvider.cpp` implements the interfaces between location manager service and HAL module.
 
-* `{"native_init", "()Z", (void*)android_location_GpsLocationProvider_init} exports the HAL init function to java framework. when this function is called, hal module will be load into memory and return GpsInterface struct to jni with gps callbacks pointing to the real implementations in hal.`
+* `{"native_init", "()Z", (void*)android_location_GpsLocationProvider_init}` exports the HAL init function to java framework. when this function is called, hal module will be load into memory and return GpsInterface struct to jni with gps callbacks pointing to the real implementations in hal.
 
-* `{"native_start", "()Z", (void*)android_location_GpsLocationProvider_start} android provider will call this native function which is implemented in location hal which will start gps hardware for location.`
+* `{"native_start", "()Z", (void*)android_location_GpsLocationProvider_start}` android provider will call this native function which is implemented in location hal which will start gps hardware for location.
 
-* `after android java framework call into hal to start location, then the location thread will call the callback functions provided to report location changes to android java framework, so the application have a chance to know the location changes and so on.`
+* after android java framework call into hal to start location, then the location thread will call the callback functions provided to report location changes to android java framework, so the application have a chance to know the location changes and so on.
 
 ## Driver Interfaces ##
 
