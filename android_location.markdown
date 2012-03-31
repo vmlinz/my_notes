@@ -10,23 +10,23 @@ Please refer to [HAL implementation](hal.markdown)
 
 ## Location Manager Service ##
 
-Android location architecture
+**Android location architecture**
 
 ![location architecture](https://github.com/vmlinz/my_notes/raw/master/location_arch.jpeg)
 
-Android location manager service initializition
+**Android location manager service initializition**
 
 ![location manager service](https://github.com/vmlinz/my_notes/raw/master/location_init.jpeg)
 
 ## Location HAL Interfaces ##
 
-	com_android_server_location_GpsLocationProvider.cpp implements the interfaces between location manager service and HAL module.
+* `com_android_server_location_GpsLocationProvider.cpp implements the interfaces between location manager service and HAL module.`
 
-	{"native_init", "()Z", (void*)android_location_GpsLocationProvider_init} exports the HAL init function to java framework. when this function is called, hal module will be load into memory and return `GpsInterface` struct to jni with gps callbacks pointing to the real implementations in hal.
+* `{"native_init", "()Z", (void*)android_location_GpsLocationProvider_init} exports the HAL init function to java framework. when this function is called, hal module will be load into memory and return GpsInterface struct to jni with gps callbacks pointing to the real implementations in hal.`
 
-	{"native_start", "()Z", (void*)android_location_GpsLocationProvider_start} android provider will call this native function which is implemented in location hal which will start gps hardware for location.
+* `{"native_start", "()Z", (void*)android_location_GpsLocationProvider_start} android provider will call this native function which is implemented in location hal which will start gps hardware for location.`
 
-	after android java framework call into hal to start location, then the location thread will call the callback functions provided to report location changes to android java framework, so the application have a chance to know the location changes and so on.
+* `after android java framework call into hal to start location, then the location thread will call the callback functions provided to report location changes to android java framework, so the application have a chance to know the location changes and so on.`
 
 ## Driver Interfaces ##
 
@@ -34,17 +34,17 @@ So according to sample gps implementation for us, the kernel part should provide
 
 ### gps serial device interface ###
 
-* device node: `/dev/ttyS0 or something else`
-* standard file operations like `open, close, read, write`
-* **read function** will give us standard nmea data line by line
-* **write function** give us a standard interface to control gps hardware
+* **device node:** `/dev/ttyS0 or something else`
+* **standard file operations like** `open, close, read, write`
+* **read function** which give us standard nmea data line by line
+* **write function** which give us a standard interface to control gps hardware
 
-### gps control, provide us a function or ioctl to power on/off gps hardware ###
+### gps io control ###
 
 * `gps_state_start`
 * `gps_state_stop`
 
-### gps transport attributes like message rate and baud rate ###
+### gps transport control ###
 
 * `gps_dev_set_nmea_message_rate`
 * `gps_dev_set_baud_rate`
