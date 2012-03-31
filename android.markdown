@@ -34,7 +34,7 @@ If an activity is paused or stopped, the system can drop it from memory either b
 
 > NOTE: You should use onPause() to write crucial persistent data (such as user edits) to storage. However, you should be selective about what information must be retained during onPause(), because any blocking procedures in this method block the transition to the next activity and slow the user experience.
 
-![Activity Lifecycle](./activity_lifecycle.png)
+![Activity Lifecycle](https://github.com/vmlinz/my_notes/raw/master/activity_lifecycle.png)
 
 
 ### The Manifest file ###
@@ -93,10 +93,10 @@ sm的源码位置：
 sm在系统初始化时启动：
 <br />
 `service servicemanager /system/bin/servicemanager
-    user system
-    critical
-    onrestart restart zygote
-    onrestart restart media
+	user system
+	critical
+	onrestart restart zygote
+	onrestart restart media
 `
 
 sm的代码：
@@ -120,11 +120,11 @@ sm的回调函数，当binder收到来自客户端的请求时，这个回调函
 下面的代码片段说明了sm在收到注册新服务时的处理过程：
 
 `case SVC_MGR_ADD_SERVICE:`
-    s = bio_get_string16(msg, &len);
-    ptr = bio_get_ref(msg);
-    if (do_add_service(bs, s, len, ptr, txn->sender_euid))
+	s = bio_get_string16(msg, &len);
+	ptr = bio_get_ref(msg);
+	if (do_add_service(bs, s, len, ptr, txn->sender_euid))
 	return -1;
-    break;
+	break;
 
 ### Service Providers ###
 
@@ -156,32 +156,32 @@ ProcessState是一个singleton类，一个进程只能有一个类实例。它�
 
 `sp<IBinder> ProcessState::getStrongProxyForHandle(int32_t handle)`
 `{`
-    sp<IBinder> result;
+	sp<IBinder> result;
 
-    AutoMutex _l(mLock);
+	AutoMutex _l(mLock);
 
-    handle_entry* e = lookupHandleLocked(handle);
+	handle_entry* e = lookupHandleLocked(handle);
 
-    if (e != NULL) {
+	if (e != NULL) {
 	// We need to create a new BpBinder if there isn't currently one, OR we
 	// are unable to acquire a weak reference on this current one.  See comment
 	// in getWeakProxyForHandle() for more info about this.
 	IBinder* b = e->binder;
 	if (b == NULL || !e->refs->attemptIncWeak(this)) {
-	    b = new BpBinder(handle);
-	    e->binder = b;
-	    if (b) e->refs = b->getWeakRefs();
-	    result = b;
+		b = new BpBinder(handle);
+		e->binder = b;
+		if (b) e->refs = b->getWeakRefs();
+		result = b;
 	} else {
-	    // This little bit of nastyness is to allow us to add a primary
-	    // reference to the remote proxy when this team doesn't have one
-	    // but another team is sending the handle to us.
-	    result.force_set(b);
-	    e->refs->decWeak(this);
+		// This little bit of nastyness is to allow us to add a primary
+		// reference to the remote proxy when this team doesn't have one
+		// but another team is sending the handle to us.
+		result.force_set(b);
+		e->refs->decWeak(this);
 	}
-    }
+	}
 
-    return result;
+	return result;
 `}`
 
 ##### IPCThtreadState #####
@@ -203,17 +203,17 @@ IPCThreadState类是ProcessState类的friend类，所以可以访问到它的私
 通过代码我们可以看出首先是通过IPCThreadState读写binder设备增加中相应binder句柄上的Service的引用计数。然后本地保存代理Service的binder句柄mHandle。客户进程对Service的请求都通过调用BpBinder的transact方法来完成。
 
 `status_t BpBinder::transact(`
-    uint32_t code, const Parcel& data, Parcel* reply, uint32_t flags)
+	uint32_t code, const Parcel& data, Parcel* reply, uint32_t flags)
 `{`
-    // Once a binder has died, it will never come back to life.
-    if (mAlive) {
+	// Once a binder has died, it will never come back to life.
+	if (mAlive) {
 	status_t status = IPCThreadState::self()->transact(
-	    mHandle, code, data, reply, flags);
+		mHandle, code, data, reply, flags);
 	if (status == DEAD_OBJECT) mAlive = 0;
 	return status;
-    }
+	}
 
-    return DEAD_OBJECT;
+	return DEAD_OBJECT;
 `}`
 
 #### ServiceManager代理 ####
@@ -222,28 +222,28 @@ libbinder中有一个全局函数defaultServiceManager可以在进程C/C++空间
 
 `sp<IServiceManager> defaultServiceManager()`
 `{`
-    if (gDefaultServiceManager != NULL) return gDefaultServiceManager;
+	if (gDefaultServiceManager != NULL) return gDefaultServiceManager;
 
-    {
+	{
 	AutoMutex _l(gDefaultServiceManagerLock);
 	if (gDefaultServiceManager == NULL) {
-	    gDefaultServiceManager = interface_cast<IServiceManager>(
+		gDefaultServiceManager = interface_cast<IServiceManager>(
 		ProcessState::self()->getContextObject(NULL));
 	}
-    }
+	}
 
-    return gDefaultServiceManager;
+	return gDefaultServiceManager;
 `}`
 
 调用getContextObject来得到servicemanager的IBinder。
 
 `sp<IBinder> ProcessState::getContextObject(const sp<IBinder>& caller)`
 `{`
-    if (supportsProcesses()) {
+	if (supportsProcesses()) {
 	return getStrongProxyForHandle(0);
-    } else {
+	} else {
 	return getContextObject(String16("default"), caller);
-    }
+	}
 `}`
 
 然后系统通过interface_cast<IServiceManager>将IBinder转换为IServiceManager的引用。这里需要参考IServiceManager的源代码。

@@ -8,7 +8,7 @@ Linux内核主要支持两种类型的USB驱动：Host系统驱动和Gadget驱�
 
 USB 拓朴结构
 
-![USB_Topology](./usb_topology.jpeg)
+![USB_Topology](https://github.com/vmlinz/my_notes/raw/master/usb_topology.jpeg)
 
 * 主机控制器 有两种标准，OHCI(Compaq)和UHCI(Intel)
 * 端点 端点是从主机到设备或者设备到主机的数据传输通道
