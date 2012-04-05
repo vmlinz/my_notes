@@ -53,28 +53,28 @@ So according to sample gps implementation for us, the kernel part should provide
 
 * struct GpsLocation;
 
-	Typedef struct {
-		/** set to sizeof(GpsLocation) */
-		size_t          size;
-		/** Contains GpsLocationFlags bits. */
-		uint16_t        flags;
-		/** Represents latitude in degrees. */
-		double          latitude;
-		/** Represents longitude in degrees. */
-		double          longitude;
-		/** Represents altitude in meters above the WGS 84 reference
-		 * ellipsoid. */
-		double          altitude;
-		/** Represents speed in meters per second. */
-		float           speed;
-		/** Represents heading in degrees. */
-		float           bearing;
-		/** Represents expected accuracy in meters. */
-		float           accuracy;
-		/** Timestamp for the location fix. */
-		GpsUtcTime      timestamp;
-	} GpsLocation;
-
+`Typedef struct {
+/** set to sizeof(GpsLocation) */
+size_t          size;
+/** Contains GpsLocationFlags bits. */
+uint16_t        flags;
+/** Represents latitude in degrees. */
+double          latitude;
+/** Represents longitude in degrees. */
+double          longitude;
+/** Represents altitude in meters above the WGS 84 reference
+* ellipsoid. */
+double          altitude;
+/** Represents speed in meters per second. */
+float           speed;
+/** Represents heading in degrees. */
+float           bearing;
+/** Represents expected accuracy in meters. */
+float           accuracy;
+/** Timestamp for the location fix. */
+GpsUtcTime      timestamp;
+} GpsLocation;
+`
 <table>
 <tbody>
 <tr>
