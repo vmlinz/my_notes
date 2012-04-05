@@ -83,12 +83,12 @@ So according to sample gps implementation for us, the kernel part should provide
 <th>description<>
 </tr>
 <tr>
-<td>size\_t</td>
+<td>size_t</td>
 <td>size</td>
 <td>size of struct GPSLocation</td>
 </tr>
 <tr>
-<td>uint16\_t</td>
+<td>uint16_t</td>
 <td>flags</td>
 <td>Contains GpsLocationFlags bits</td>
 </tr>
@@ -148,7 +148,7 @@ So according to sample gps implementation for us, the kernel part should provide
 <th>description<>
 </tr>
 <tr>
-<td>size\_t</td>
+<td>size_t</td>
 <td>size</td>
 <td>set to sizeof(GpsStatus)</td>
 </tr>
