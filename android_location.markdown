@@ -53,28 +53,28 @@ So according to sample gps implementation for us, the kernel part should provide
 
 * struct GpsLocation;
 
-`Typedef struct {
-/** set to sizeof(GpsLocation) */
-size_t          size;
-/** Contains GpsLocationFlags bits. */
-uint16_t        flags;
-/** Represents latitude in degrees. */
-double          latitude;
-/** Represents longitude in degrees. */
-double          longitude;
-/** Represents altitude in meters above the WGS 84 reference
-* ellipsoid. */
-double          altitude;
-/** Represents speed in meters per second. */
-float           speed;
-/** Represents heading in degrees. */
-float           bearing;
-/** Represents expected accuracy in meters. */
-float           accuracy;
-/** Timestamp for the location fix. */
-GpsUtcTime      timestamp;
-} GpsLocation;
-`
+	Typedef struct {
+	/** set to sizeof(GpsLocation) */
+	size_t          size;
+	/** Contains GpsLocationFlags bits. */
+	uint16_t        flags;
+	/** Represents latitude in degrees. */
+	double          latitude;
+	/** Represents longitude in degrees. */
+	double          longitude;
+	/** Represents altitude in meters above the WGS 84 reference
+	* ellipsoid. */
+	double          altitude;
+	/** Represents speed in meters per second. */
+	float           speed;
+	/** Represents heading in degrees. */
+	float           bearing;
+	/** Represents expected accuracy in meters. */
+	float           accuracy;
+	/** Timestamp for the location fix. */
+	GpsUtcTime      timestamp;
+	} GpsLocation;
+
 <table>
 <tbody>
 <tr>
@@ -83,12 +83,12 @@ GpsUtcTime      timestamp;
 <th>description<>
 </tr>
 <tr>
-<td>size_t</td>
+<td>size\_t</td>
 <td>size</td>
 <td>size of struct GPSLocation</td>
 </tr>
 <tr>
-<td>`uint16_t`</td>
+<td>uint16\_t</td>
 <td>flags</td>
 <td>Contains GpsLocationFlags bits</td>
 </tr>
@@ -131,15 +131,39 @@ GpsUtcTime      timestamp;
 </tbody>
 </table>
 
-* `/** Represents the status. */
-typedef struct {
-	/** set to sizeof(GpsStatus) */
-	size_t          size;
-	GpsStatusValue status;
-} GpsStatus;`
+* struct GpsStatus;
 
-* `/** Represents SV information. */
-typedef struct {
+	/** Represents the status. */
+	typedef struct {
+		/** set to sizeof(GpsStatus) */
+		size_t          size;
+		GpsStatusValue status;
+	} GpsStatus;
+
+<table>
+<tbody>
+<tr>
+<th>type</th>
+<th>value</th>
+<th>description<>
+</tr>
+<tr>
+<td>size\_t</td>
+<td>size</td>
+<td>set to sizeof(GpsStatus)</td>
+</tr>
+<tr>
+<td>GpsStatusValue</td>
+<td>status</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+* struct GpsSvInfo;
+
+	/** Represents SV information. */
+	typedef struct {
 	/** set to sizeof(GpsSvInfo) */
 	size_t          size;
 	/** Pseudo-random number for the SV. */
@@ -150,7 +174,37 @@ typedef struct {
 	float   elevation;
 	/** Azimuth of SV in degrees. */
 	float   azimuth;
-} GpsSvInfo;`
+	} GpsSvInfo;
+
+<table>
+<tbody>
+<tr>
+<th>type</th>
+<th>value</th>
+<th>description<>
+</tr>
+<tr>
+<td>int</td>
+<td>prn</td>
+<td>Pseudo-random number for the SV.</td>
+</tr>
+<tr>
+<td>float</td>
+<td>snr</td>
+<td>Signal to noise ratio.</td>
+</tr>
+<tr>
+<td>float</td>
+<td>elevation</td>
+<td>Elevation of SV in degrees.</td>
+</tr>
+<tr>
+<td>float</td>
+<td>azimuth</td>
+<td>Azimuth of SV in degrees.</td>
+</tr>
+</tbody>
+</table>
 
 ## Files ##
 
