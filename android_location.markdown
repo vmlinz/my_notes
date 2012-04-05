@@ -53,27 +53,28 @@ So according to sample gps implementation for us, the kernel part should provide
 
 * struct GpsLocation;
 
-	Typedef struct {
-	/** set to sizeof(GpsLocation) */
-	size_t          size;
-	/** Contains GpsLocationFlags bits. */
-	uint16_t        flags;
-	/** Represents latitude in degrees. */
-	double          latitude;
-	/** Represents longitude in degrees. */
-	double          longitude;
-	/** Represents altitude in meters above the WGS 84 reference
-	* ellipsoid. */
-	double          altitude;
-	/** Represents speed in meters per second. */
-	float           speed;
-	/** Represents heading in degrees. */
-	float           bearing;
-	/** Represents expected accuracy in meters. */
-	float           accuracy;
-	/** Timestamp for the location fix. */
-	GpsUtcTime      timestamp;
-	} GpsLocation;
+`Typedef struct {
+/** set to sizeof(GpsLocation) */
+size_t          size;
+/** Contains GpsLocationFlags bits. */
+uint16_t        flags;
+/** Represents latitude in degrees. */
+double          latitude;
+/** Represents longitude in degrees. */
+double          longitude;
+/** Represents altitude in meters above the WGS 84 reference
+* ellipsoid. */
+double          altitude;
+/** Represents speed in meters per second. */
+float           speed;
+/** Represents heading in degrees. */
+float           bearing;
+/** Represents expected accuracy in meters. */
+float           accuracy;
+/** Timestamp for the location fix. */
+GpsUtcTime      timestamp;
+} GpsLocation;
+`
 
 <table>
 <tbody>
@@ -133,12 +134,13 @@ So according to sample gps implementation for us, the kernel part should provide
 
 * struct GpsStatus;
 
-	/** Represents the status. */
-	typedef struct {
-		/** set to sizeof(GpsStatus) */
-		size_t          size;
-		GpsStatusValue status;
-	} GpsStatus;
+`/** Represents the status. */
+typedef struct {
+/** set to sizeof(GpsStatus) */
+size_t          size;
+GpsStatusValue status;
+} GpsStatus;
+`
 
 <table>
 <tbody>
@@ -162,19 +164,20 @@ So according to sample gps implementation for us, the kernel part should provide
 
 * struct GpsSvInfo;
 
-	/** Represents SV information. */
-	typedef struct {
-	/** set to sizeof(GpsSvInfo) */
-	size_t          size;
-	/** Pseudo-random number for the SV. */
-	int     prn;
-	/** Signal to noise ratio. */
-	float   snr;
-	/** Elevation of SV in degrees. */
-	float   elevation;
-	/** Azimuth of SV in degrees. */
-	float   azimuth;
-	} GpsSvInfo;
+`/** Represents SV information. */
+typedef struct {
+/** set to sizeof(GpsSvInfo) */
+size_t          size;
+/** Pseudo-random number for the SV. */
+int     prn;
+/** Signal to noise ratio. */
+float   snr;
+/** Elevation of SV in degrees. */
+float   elevation;
+/** Azimuth of SV in degrees. */
+float   azimuth;
+} GpsSvInfo;
+`
 
 <table>
 <tbody>
