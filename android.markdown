@@ -300,5 +300,24 @@ java binder使用和c/c++层的同样的binder封装，它的最终实现都是�
  - `jobject android_os_Parcel_readStrongBinder();`
 
 # Android Middleware #
+# Android Base System #
+## init process ##
+
+Init 负责解析启动脚本`init.rc`，再按照脚本内容初始化系统，同时fork出属性设置服务和信号处理服务
+
+* `init_parse_config_file();` 解析`init.rc`，得到命令链表
+* `action_for_each_trigger();` 将`init.rc`中各种不同类型的动作添加到链表
+* `queue_builtin_action();` 将系统内部的服务添加到链表，主要是property设置服务和信号处理服务
+* `execute_one_command();` 执行链表中的服务和命令
+* `poll(ufds, fd_count, timeout);` 轮询3个系统服务的socket，等待处理相应的请求
+
+## ueventd ##
+## Zygote process ##
+Zygote 是Java 运行空间的孵化器
+* zygote 运行之后fork出system_server来启动系统的所有服务线程
+* zygote 自己本身进入socket的循环，准备接受activity manager service的请求fork app进程
+* zygote fork app进程并给进程相应的初始化之后，app进程如何继续运行的？
+## system server ##
+## zygote fork service ##
 # Android Linux Kernel #
 # Android Open Source Project #

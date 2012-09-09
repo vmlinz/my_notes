@@ -45,12 +45,12 @@ thinkfan会在系统的运行级别中添加thinkfan的后台服务，这样就�
 
 cat /proc/acpi/ibm/fan可以得到控制风扇的方法。
 
-* echo level 0 | sudo tee /proc/acpi/ibm/fan (fan off)
-* echo level 2 | sudo tee /proc/acpi/ibm/fan (low speed)
-* echo level 4 | sudo tee /proc/acpi/ibm/fan (medium speed)
-* echo level 7 | sudo tee  /proc/acpi/ibm/fan (maximum speed)
-* echo level auto | sudo tee /proc/acpi/ibm/fan (automatic - default)
-* echo level disengaged | sudo tee /proc/acpi/ibm/fan (disengaged)
+* echo 'level 0' | sudo tee /proc/acpi/ibm/fan (fan off)
+* echo 'level 2' | sudo tee /proc/acpi/ibm/fan (low speed)
+* echo 'level 4' | sudo tee /proc/acpi/ibm/fan (medium speed)
+* echo 'level 7' | sudo tee  /proc/acpi/ibm/fan (maximum speed)
+* echo 'level auto' | sudo tee /proc/acpi/ibm/fan (automatic - default)
+* echo 'level disengaged' | sudo tee /proc/acpi/ibm/fan (disengaged)
 
 我们可以看到其中有一个auto选项，说明驱动本身是要自己实现风扇只能控制的，我之前查看>
 <br />的时候就发现驱动的默认设置就是auto，可惜它么能正常工作。
